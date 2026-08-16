@@ -23,5 +23,10 @@ namespace EnterpriseTaskManagement.Application.Services
         {
             return _repository.GetById(Id);
         }
+
+        public void AddTask(TaskItem task)
+        {
+            _repository.Add(task);
+        }
     }
 }

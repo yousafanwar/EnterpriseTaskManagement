@@ -9,5 +9,6 @@ namespace EnterpriseTaskManagement.Application.Services
     {
         string GetMessage();
         TaskItem? GetTask(int Id);
+        void AddTask(TaskItem task);
     }
 }

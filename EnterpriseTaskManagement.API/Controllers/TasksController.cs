@@ -1,4 +1,6 @@
 ﻿using EnterpriseTaskManagement.Application.Services;
+using EnterpriseTaskManagement.Domain.Entities;
+using EnterpriseTaskManagement.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EnterpriseTaskManagement.API.Controllers;
@@ -31,6 +33,17 @@ public class TasksController : ControllerBase
             return NotFound();
         }
 
+        return Ok(task);
+    }
+
+    [HttpPost]
+    public IActionResult CreateTask(CreateTaskRequest request)
+    {
+        var task = new TaskItem(
+                request.Title,
+                request.Description
+            );
+        _taskService.AddTask(task);
         return Ok(task);
     }
 }
