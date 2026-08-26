@@ -1,4 +1,5 @@
-﻿using EnterpriseTaskManagement.Application.Repositories;
+﻿using EnterpriseTaskManagement.Application.DTOs;
+using EnterpriseTaskManagement.Application.Repositories;
 using EnterpriseTaskManagement.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -19,14 +20,86 @@ namespace EnterpriseTaskManagement.Application.Services
             return _repository.GetTaskTitle();
         }
 
-        public TaskItem? GetTask(int Id)
+        public TaskItemDto? GetTask(int Id)
         {
-            return _repository.GetById(Id);
+            var task = _repository.GetById(Id);
+
+            if(task == null)
+            {
+                return null;
+            }
+
+            return new TaskItemDto
+            {
+                Id = task.Id,
+                Title = task.Title,
+                Description = task.Description
+            };
         }
 
-        public void AddTask(TaskItem task)
+        public TaskItemDto AddTask(CreateTaskRequest request)
         {
+            var task = new TaskItem(
+                    request.Title,
+                    request.Description
+                );            
+            
             _repository.Add(task);
+
+            return new TaskItemDto
+            {
+                Id = task.Id,
+                Title = task.Title,
+                Description = task.Description
+            };
+        }
+
+        public IEnumerable<TaskItemDto> GetTasks()
+        {
+            var tasks = _repository.GetAll();
+            return tasks.Select(task => new TaskItemDto
+            {
+                Id = task.Id,
+                Title = task.Title,
+                Description = task.Description
+            });
+        }
+
+        public TaskItemDto? UpdateTask(int id, UpdateTaskRequest request)
+        {
+            var task = _repository.GetById(id);
+
+            if (task == null)
+            {
+                return null;
+            }
+
+            task.UpdateDetails(
+                request.Title,
+                request.Description
+            );
+
+            _repository.Update(task);
+
+            return new TaskItemDto
+            {
+                Id = task.Id,
+                Title = task.Title,
+                Description = task.Description
+            };
+        }
+        public bool DeleteTask(int id)
+        {
+            var task = _repository.GetById(id);
+
+            if (task == null)
+            {
+                return false;
+            }
+
+            _repository.Delete(task);
+
+            return true;
         }
     }
 }

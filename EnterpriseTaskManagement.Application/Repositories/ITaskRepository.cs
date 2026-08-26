@@ -11,5 +11,8 @@ namespace EnterpriseTaskManagement.Application.Repositories
 
         TaskItem? GetById(int Id);
         void Add(TaskItem task);
+        IEnumerable<TaskItem> GetAll();
+        void Update(TaskItem task);
+        void Delete(TaskItem task);
     }
 }

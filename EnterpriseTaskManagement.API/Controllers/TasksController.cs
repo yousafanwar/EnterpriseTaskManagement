@@ -25,7 +25,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetTask(int id)
+    public ActionResult<TaskItemDto> GetTask(int id)
     {
         var task = _taskService.GetTask(id);
         if(task == null)
@@ -33,17 +33,51 @@ public class TasksController : ControllerBase
             return NotFound();
         }
 
-        return Ok(task);
+        return task;
     }
 
     [HttpPost]
-    public IActionResult CreateTask(CreateTaskRequest request)
+    public ActionResult<TaskItemDto> CreateTask(CreateTaskRequest request)  
     {
-        var task = new TaskItem(
-                request.Title,
-                request.Description
+        var task = _taskService.AddTask(request);
+        //return Ok(task);
+        return CreatedAtAction(
+                nameof(GetTask),
+                new { id = task.Id},
+                task
             );
-        _taskService.AddTask(task);
+    }
+
+    [HttpGet]
+    public ActionResult<IEnumerable<TaskItemDto>> GetTasks()
+    {
+        var tasks = _taskService.GetTasks();
+        return Ok(tasks);
+    }
+
+    [HttpPut("{id}")]
+    public ActionResult<TaskItemDto> UpdateTask(int id, UpdateTaskRequest request)
+    {
+        var task = _taskService.UpdateTask(id, request);
+
+        if (task == null)
+        {
+            return NotFound();
+        }
+
         return Ok(task);
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult DeleteTask(int id)
+    {
+        var deleted = _taskService.DeleteTask(id);
+
+        if (!deleted)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
     }
 }

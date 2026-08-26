@@ -40,5 +40,11 @@ namespace EnterpriseTaskManagement.Domain.Entities
             }
             Status = TaskItemStatus.Completed;
         }
+
+        public void UpdateDetails(string title, string description)
+        {
+            Title = title;
+            Description = description;
+        }
     }
 }

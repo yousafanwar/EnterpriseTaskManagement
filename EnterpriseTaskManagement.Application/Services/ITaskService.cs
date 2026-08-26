@@ -1,14 +1,19 @@
-﻿using System;
+﻿using EnterpriseTaskManagement.Application.DTOs;
+using EnterpriseTaskManagement.Domain.Entities;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using EnterpriseTaskManagement.Domain.Entities;
 
 namespace EnterpriseTaskManagement.Application.Services
 {
     public interface ITaskService
     {
         string GetMessage();
-        TaskItem? GetTask(int Id);
-        void AddTask(TaskItem task);
+        TaskItemDto? GetTask(int Id);
+        TaskItemDto AddTask(CreateTaskRequest request);
+        IEnumerable<TaskItemDto> GetTasks();
+        TaskItemDto? UpdateTask(int Id, UpdateTaskRequest request);
+        bool DeleteTask(int id);
     }
 }

@@ -27,4 +27,21 @@ public class TaskRepository : ITaskRepository
         _dbContext.Tasks.Add(task);
         _dbContext.SaveChanges();
     }
+
+    public IEnumerable<TaskItem> GetAll()
+    {
+        return _dbContext.Tasks.ToList();
+    }
+
+    public void Update(TaskItem task)
+    {
+        _dbContext.Tasks.Update(task);
+        _dbContext.SaveChanges();
+
+    }
+    public void Delete(TaskItem task)
+    {
+        _dbContext.Tasks.Remove(task);
+        _dbContext.SaveChanges();
+    }
 }
