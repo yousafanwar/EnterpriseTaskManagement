@@ -18,16 +18,16 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet("message")]
-    public IActionResult GetMessage()
+    public async Task<IActionResult> GetMessage()
     {
-        var message = _taskService.GetMessage();
+        var message = await _taskService.GetMessageAsync();
         return Ok(message);
     }
 
     [HttpGet("{id}")]
-    public ActionResult<TaskItemDto> GetTask(int id)
+    public async Task<ActionResult<TaskItemDto>> GetTask(int id)
     {
-        var task = _taskService.GetTask(id);
+        var task = await _taskService.GetTaskAsync(id);
         if(task == null)
         {
             return NotFound();
@@ -37,9 +37,9 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<TaskItemDto> CreateTask(CreateTaskRequest request)  
+    public async Task<ActionResult<TaskItemDto>> CreateTask(CreateTaskRequest request)  
     {
-        var task = _taskService.AddTask(request);
+        var task = await _taskService.AddTaskAsync(request);
         //return Ok(task);
         return CreatedAtAction(
                 nameof(GetTask),
@@ -49,16 +49,16 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<TaskItemDto>> GetTasks()
+    public async Task<ActionResult<IEnumerable<TaskItemDto>>> GetTasks()
     {
-        var tasks = _taskService.GetTasks();
+        var tasks = await _taskService.GetTasksAsync();
         return Ok(tasks);
     }
 
     [HttpPut("{id}")]
-    public ActionResult<TaskItemDto> UpdateTask(int id, UpdateTaskRequest request)
+    public async Task<ActionResult<TaskItemDto>> UpdateTask(int id, UpdateTaskRequest request)
     {
-        var task = _taskService.UpdateTask(id, request);
+        var task = await _taskService.UpdateTaskAsync(id, request);
 
         if (task == null)
         {
@@ -69,9 +69,9 @@ public class TasksController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteTask(int id)
+    public async Task<IActionResult> DeleteTask(int id)
     {
-        var deleted = _taskService.DeleteTask(id);
+        var deleted = await _taskService.DeleteTaskAsync(id);
 
         if (!deleted)
         {

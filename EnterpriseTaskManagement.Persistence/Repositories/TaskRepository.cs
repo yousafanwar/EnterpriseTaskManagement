@@ -1,5 +1,6 @@
 ﻿using EnterpriseTaskManagement.Domain.Entities;
 using EnterpriseTaskManagement.Application.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace EnterpriseTaskManagement.Persistence.Repositories;
 
@@ -12,36 +13,36 @@ public class TaskRepository : ITaskRepository
         _dbContext = dbContext;
 
     }
-    public string GetTaskTitle()
+    public async Task<string> GetTaskTitleAsync()
     {
-        return _dbContext.Tasks.Select(task => task.Title).FirstOrDefault() ?? "No tasks found";
+        return await _dbContext.Tasks.Select(task => task.Title).FirstOrDefaultAsync() ?? "No tasks found";
     }
 
-    public TaskItem? GetById(int id)
+    public async Task<TaskItem?> GetByIdAsync(int id)
     {
-        return _dbContext.Tasks.FirstOrDefault(task => task.Id == id);
+        return await _dbContext.Tasks.FindAsync(id);
     }
 
-    public void Add(TaskItem task)
+    public async Task AddTask(TaskItem task)
     {
-        _dbContext.Tasks.Add(task);
-        _dbContext.SaveChanges();
+        await _dbContext.Tasks.AddAsync(task);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public IEnumerable<TaskItem> GetAll()
+    public async Task <IEnumerable<TaskItem>> GetAllAsync()
     {
-        return _dbContext.Tasks.ToList();
+        return await _dbContext.Tasks.ToListAsync();
     }
 
-    public void Update(TaskItem task)
+    public async Task UpdateAsync(TaskItem task)
     {
         _dbContext.Tasks.Update(task);
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync();
 
     }
-    public void Delete(TaskItem task)
+    public async Task DeleteAsync(TaskItem task)
     {
         _dbContext.Tasks.Remove(task);
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync();
     }
 }

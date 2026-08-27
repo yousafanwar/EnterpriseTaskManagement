@@ -9,11 +9,11 @@ namespace EnterpriseTaskManagement.Application.Services
 {
     public interface ITaskService
     {
-        string GetMessage();
-        TaskItemDto? GetTask(int Id);
-        TaskItemDto AddTask(CreateTaskRequest request);
-        IEnumerable<TaskItemDto> GetTasks();
-        TaskItemDto? UpdateTask(int Id, UpdateTaskRequest request);
-        bool DeleteTask(int id);
+        Task<string> GetMessageAsync();
+        Task<TaskItemDto?> GetTaskAsync(int Id);
+        Task<TaskItemDto> AddTaskAsync(CreateTaskRequest request);
+        Task<IEnumerable<TaskItemDto>> GetTasksAsync();
+        Task<TaskItemDto?> UpdateTaskAsync(int Id, UpdateTaskRequest request);
+        Task<bool> DeleteTaskAsync(int id);
     }
 }

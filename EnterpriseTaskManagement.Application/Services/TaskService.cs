@@ -15,14 +15,14 @@ namespace EnterpriseTaskManagement.Application.Services
         {
             _repository = repository;
         }
-        public string GetMessage()
+        public async Task<string> GetMessageAsync()
         {
-            return _repository.GetTaskTitle();
+            return await _repository.GetTaskTitleAsync();
         }
 
-        public TaskItemDto? GetTask(int Id)
+        public async Task<TaskItemDto?> GetTaskAsync(int Id)
         {
-            var task = _repository.GetById(Id);
+            var task = await _repository.GetByIdAsync(Id);
 
             if(task == null)
             {
@@ -37,14 +37,14 @@ namespace EnterpriseTaskManagement.Application.Services
             };
         }
 
-        public TaskItemDto AddTask(CreateTaskRequest request)
+        public async Task <TaskItemDto> AddTaskAsync(CreateTaskRequest request)
         {
             var task = new TaskItem(
                     request.Title,
                     request.Description
                 );            
             
-            _repository.Add(task);
+            await _repository.AddTask(task);
 
             return new TaskItemDto
             {
@@ -54,9 +54,9 @@ namespace EnterpriseTaskManagement.Application.Services
             };
         }
 
-        public IEnumerable<TaskItemDto> GetTasks()
+        public async Task<IEnumerable<TaskItemDto>> GetTasksAsync()
         {
-            var tasks = _repository.GetAll();
+            var tasks = await _repository.GetAllAsync();
             return tasks.Select(task => new TaskItemDto
             {
                 Id = task.Id,
@@ -65,9 +65,9 @@ namespace EnterpriseTaskManagement.Application.Services
             });
         }
 
-        public TaskItemDto? UpdateTask(int id, UpdateTaskRequest request)
+        public async Task <TaskItemDto?> UpdateTaskAsync(int id, UpdateTaskRequest request)
         {
-            var task = _repository.GetById(id);
+            var task = await _repository.GetByIdAsync(id);
 
             if (task == null)
             {
@@ -79,7 +79,7 @@ namespace EnterpriseTaskManagement.Application.Services
                 request.Description
             );
 
-            _repository.Update(task);
+            await _repository.UpdateAsync(task);
 
             return new TaskItemDto
             {
@@ -88,16 +88,16 @@ namespace EnterpriseTaskManagement.Application.Services
                 Description = task.Description
             };
         }
-        public bool DeleteTask(int id)
+        public async Task<bool> DeleteTaskAsync(int id)
         {
-            var task = _repository.GetById(id);
+            var task = await _repository.GetByIdAsync(id);
 
             if (task == null)
             {
                 return false;
             }
 
-            _repository.Delete(task);
+            await _repository.DeleteAsync(task);
 
             return true;
         }

@@ -7,12 +7,12 @@ namespace EnterpriseTaskManagement.Application.Repositories
 {
     public interface ITaskRepository
     {
-        string GetTaskTitle();
+        Task <string> GetTaskTitleAsync();
 
-        TaskItem? GetById(int Id);
-        void Add(TaskItem task);
-        IEnumerable<TaskItem> GetAll();
-        void Update(TaskItem task);
-        void Delete(TaskItem task);
+        Task <TaskItem?> GetByIdAsync(int Id);
+        Task AddTask(TaskItem task);
+        Task <IEnumerable<TaskItem>> GetAllAsync();
+        Task UpdateAsync(TaskItem task);
+        Task DeleteAsync(TaskItem task);
     }
 }
