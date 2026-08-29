@@ -57,16 +57,28 @@ namespace EnterpriseTaskManagement.Application.Services
             };
         }
 
-        public async Task<IEnumerable<TaskItemDto>> GetTasksAsync()
+        public async Task<PagedResult<TaskItemDto>> GetTasksAsync(
+            TaskQueryRequest request)
         {
-            var tasks = await _repository.GetAllAsync();
-            return tasks.Select(task => new TaskItemDto
+            var result = await _repository.GetAllAsync(request);
+
+            var tasks = result.Tasks.Select(task => new TaskItemDto
             {
                 Id = task.Id,
                 Title = task.Title,
                 Description = task.Description,
                 Status = task.Status
             });
+
+            return new PagedResult<TaskItemDto>
+            {
+                Items = tasks,
+                Page = request.Page,
+                PageSize = request.PageSize,
+                TotalCount = result.TotalCount,
+                TotalPages = (int)Math.Ceiling(
+                    result.TotalCount / (double)request.PageSize)
+            };
         }
 
         public async Task <TaskItemDto?> UpdateTaskAsync(int id, UpdateTaskRequest request)

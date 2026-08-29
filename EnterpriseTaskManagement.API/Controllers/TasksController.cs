@@ -42,10 +42,12 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TaskItemDto>>> GetTasks()
+    public async Task<ActionResult<PagedResult<TaskItemDto>>> GetTasks(
+        [FromQuery] TaskQueryRequest request)
     {
-        var tasks = await _taskService.GetTasksAsync();
-        return Ok(tasks);
+        var result = await _taskService.GetTasksAsync(request);
+
+        return Ok(result);
     }
 
     [HttpPut("{id}")]

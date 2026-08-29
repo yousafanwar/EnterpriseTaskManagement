@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using EnterpriseTaskManagement.Application.DTOs;
 using EnterpriseTaskManagement.Domain.Entities;
 
 namespace EnterpriseTaskManagement.Application.Repositories
@@ -9,7 +10,7 @@ namespace EnterpriseTaskManagement.Application.Repositories
     {
         Task <TaskItem?> GetByIdAsync(int Id);
         Task AddTask(TaskItem task);
-        Task <IEnumerable<TaskItem>> GetAllAsync();
+        Task <(IEnumerable<TaskItem> Tasks, int TotalCount)> GetAllAsync(TaskQueryRequest request);
         Task UpdateAsync(TaskItem task);
         Task DeleteAsync(TaskItem task);
     }

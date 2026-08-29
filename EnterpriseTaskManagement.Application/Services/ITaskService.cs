@@ -11,7 +11,7 @@ namespace EnterpriseTaskManagement.Application.Services
     {
         Task<TaskItemDto?> GetTaskAsync(int id);
         Task<TaskItemDto> AddTaskAsync(CreateTaskRequest request);
-        Task<IEnumerable<TaskItemDto>> GetTasksAsync();
+        Task<PagedResult<TaskItemDto>> GetTasksAsync(TaskQueryRequest request);
         Task<TaskItemDto?> UpdateTaskAsync(int id, UpdateTaskRequest request);
         Task<bool> DeleteTaskAsync(int id);
         Task<TaskItemDto?> AssignTaskAsync(int taskId, int userId);
