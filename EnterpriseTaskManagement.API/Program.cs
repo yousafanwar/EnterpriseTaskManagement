@@ -1,5 +1,6 @@
 using EnterpriseTaskManagement.Application.Repositories;
 using EnterpriseTaskManagement.Application.Services;
+using EnterpriseTaskManagement.Application.Services.UserService;
 using EnterpriseTaskManagement.Persistence;
 using EnterpriseTaskManagement.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Register Swagger
 builder.Services.AddEndpointsApiExplorer();
