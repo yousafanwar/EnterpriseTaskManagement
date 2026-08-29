@@ -7,8 +7,6 @@ namespace EnterpriseTaskManagement.Application.Repositories
 {
     public interface ITaskRepository
     {
-        Task <string> GetTaskTitleAsync();
-
         Task <TaskItem?> GetByIdAsync(int Id);
         Task AddTask(TaskItem task);
         Task <IEnumerable<TaskItem>> GetAllAsync();

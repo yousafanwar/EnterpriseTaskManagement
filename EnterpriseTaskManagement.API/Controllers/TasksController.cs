@@ -17,13 +17,6 @@ public class TasksController : ControllerBase
         _taskService = taskService;
     }
 
-    [HttpGet("message")]
-    public async Task<IActionResult> GetMessage()
-    {
-        var message = await _taskService.GetMessageAsync();
-        return Ok(message);
-    }
-
     [HttpGet("{id}")]
     public async Task<ActionResult<TaskItemDto>> GetTask(int id)
     {

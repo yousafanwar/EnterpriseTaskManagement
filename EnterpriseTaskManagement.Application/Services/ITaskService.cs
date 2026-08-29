@@ -9,7 +9,6 @@ namespace EnterpriseTaskManagement.Application.Services
 {
     public interface ITaskService
     {
-        Task<string> GetMessageAsync();
         Task<TaskItemDto?> GetTaskAsync(int Id);
         Task<TaskItemDto> AddTaskAsync(CreateTaskRequest request);
         Task<IEnumerable<TaskItemDto>> GetTasksAsync();

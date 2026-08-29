@@ -12,6 +12,7 @@ namespace EnterpriseTaskManagement.Domain.Entities
         public string Description { get; private set; }
         public TaskItemStatus Status { get; private set; }
         public int? AssigneeId { get; private set; }
+        public User? Assignee { get; private set; }
 
         private TaskItem () 
         { 

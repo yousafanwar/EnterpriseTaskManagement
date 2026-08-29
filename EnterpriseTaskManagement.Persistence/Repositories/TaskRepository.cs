@@ -13,10 +13,6 @@ public class TaskRepository : ITaskRepository
         _dbContext = dbContext;
 
     }
-    public async Task<string> GetTaskTitleAsync()
-    {
-        return await _dbContext.Tasks.Select(task => task.Title).FirstOrDefaultAsync() ?? "No tasks found";
-    }
 
     public async Task<TaskItem?> GetByIdAsync(int id)
     {

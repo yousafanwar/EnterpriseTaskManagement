@@ -14,5 +14,15 @@ namespace EnterpriseTaskManagement.Persistence
         }
 
         public DbSet<TaskItem> Tasks { get; set; }
+        public DbSet<User> Users { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TaskItem>()
+                .HasOne(task => task.Assignee)
+                .WithMany()
+                .HasForeignKey(task => task.AssigneeId)
+                .OnDelete(DeleteBehavior.SetNull);
+        }
     }
 }

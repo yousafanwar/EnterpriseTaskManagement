@@ -45,7 +45,44 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AssigneeId");
+
                     b.ToTable("Tasks");
+                });
+
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.TaskItem", b =>
+                {
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.User", "Assignee")
+                        .WithMany()
+                        .HasForeignKey("AssigneeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Assignee");
                 });
 #pragma warning restore 612, 618
         }

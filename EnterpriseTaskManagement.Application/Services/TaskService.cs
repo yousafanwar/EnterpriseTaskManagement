@@ -15,10 +15,6 @@ namespace EnterpriseTaskManagement.Application.Services
         {
             _repository = repository;
         }
-        public async Task<string> GetMessageAsync()
-        {
-            return await _repository.GetTaskTitleAsync();
-        }
 
         public async Task<TaskItemDto?> GetTaskAsync(int Id)
         {
