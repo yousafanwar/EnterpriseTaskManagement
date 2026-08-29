@@ -30,6 +30,26 @@ namespace EnterpriseTaskManagement.Domain.Entities
             AssigneeId = userId;
         }
 
+        public void Start()
+        {
+            if(AssigneeId == null)
+            {
+                throw new InvalidOperationException
+                    (
+                        "A task must have a assignee before it can be started"
+                    );
+            }
+
+            if(Status != TaskItemStatus.Pending)
+            {
+                throw new InvalidOperationException
+                    (
+                        "Only pending tasks can be started"
+                    );
+            }
+            Status = TaskItemStatus.InProgress;
+        }
+
         public void Complete()
         {
             if(AssigneeId == null)
@@ -39,6 +59,15 @@ namespace EnterpriseTaskManagement.Domain.Entities
                         "A task must have a assignee before it can be marked complete"
                     );
             }
+
+            if (Status != TaskItemStatus.InProgress)
+            {
+                throw new InvalidOperationException
+                    (
+                        "Only in progress tasks can be mark completed"
+                    );
+            }
+
             Status = TaskItemStatus.Completed;
         }
 

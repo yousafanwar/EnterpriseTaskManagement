@@ -73,4 +73,43 @@ public class TasksController : ControllerBase
 
         return NoContent();
     }
+    [HttpPut("{taskId}/assign/{userId}")]
+    public async Task<ActionResult<TaskItemDto?>> AssignTask(int taskId, int userId)
+    {
+        var task = await _taskService.AssignTaskAsync(taskId, userId);
+
+        if(task == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(task);
+    }
+
+    [HttpPut("{id}/start")]
+    public async Task<ActionResult<TaskItemDto?>> StartTask(int id)
+    {
+        var task = await _taskService.StartTaskAsync(id);
+        
+        if (task == null)
+        {
+            return NotFound();
+        }
+        
+        return Ok(task);
+    }
+
+    [HttpPut("{id}/complete")]
+    public async Task<ActionResult<TaskItemDto?>> CompleteTask(int id)
+    {
+        var task = await _taskService.CompleteTaskAsync(id);
+
+        if (task == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(task);
+    }
+
 }
