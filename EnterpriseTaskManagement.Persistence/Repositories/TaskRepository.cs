@@ -49,10 +49,35 @@ public class TaskRepository : ITaskRepository
             query = query.Where(task => task.AssigneeId == request.AssigneeId);
         }
 
+        switch (request.SortBy?.ToLower())
+        {
+            case "title":
+                query = request.SortOrder?.ToLower() == "desc"
+                    ? query.OrderByDescending(task => task.Title)
+                    : query.OrderBy(task => task.Title);
+                break;
+
+            case "status":
+                query = request.SortOrder?.ToLower() == "desc"
+                    ? query.OrderByDescending(task => task.Status)
+                    : query.OrderBy(task => task.Status);
+                break;
+            case "description":
+                query = request.SortOrder?.ToLower() == "desc"
+                    ? query.OrderByDescending(task => task.Description)
+                    : query.OrderBy(task => task.Description);
+                break;
+
+            default:
+                query = request.SortOrder?.ToLower() == "desc"
+                    ? query.OrderByDescending(task => task.Id)
+                    : query.OrderBy(task => task.Id);
+                break;
+        }
+
         var totalCount = await query.CountAsync();
 
         var tasks = await query
-            .OrderBy(task => task.Id)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync();

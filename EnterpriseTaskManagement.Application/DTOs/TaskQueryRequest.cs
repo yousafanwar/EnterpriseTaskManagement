@@ -13,5 +13,7 @@ namespace EnterpriseTaskManagement.Application.DTOs
         public TaskItemStatus? Status { get; set; }
         public int? AssigneeId { get; set; }
         public string? Search { get; set; }
+        public string? SortBy { get; set; }
+        public string? SortOrder { get; set; }
     }
 }
