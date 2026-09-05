@@ -10,16 +10,20 @@ namespace EnterpriseTaskManagement.Domain.Entities
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
         public string Email { get; private set; }
+
+        public int RoleId { get; private set; }
+        public Role Role { get; private set; }
         private User()
             {
 
             }
 
-        public User(string firstName, string lastName, string email)
+        public User(string firstName, string lastName, string email, int roleId)
         {
             FirstName = firstName;
             LastName = lastName;
             Email = email;
+            RoleId = roleId;
         }
     }
 

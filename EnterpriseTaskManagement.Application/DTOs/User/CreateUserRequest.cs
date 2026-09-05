@@ -19,5 +19,7 @@ namespace EnterpriseTaskManagement.Application.DTOs.User
         [StringLength(150)]
         [EmailAddress]
         public string Email { get; set; }
+
+        public int RoleId { get; set; }
     }
 }

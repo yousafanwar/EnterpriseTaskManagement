@@ -15,6 +15,7 @@ namespace EnterpriseTaskManagement.Persistence
 
         public DbSet<TaskItem> Tasks { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -23,6 +24,11 @@ namespace EnterpriseTaskManagement.Persistence
                 .WithMany()
                 .HasForeignKey(task => task.AssigneeId)
                 .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<User>()
+                .HasOne(user => user.Role)
+                .WithMany()
+                .HasForeignKey(user => user.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

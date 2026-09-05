@@ -47,7 +47,8 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
             var user = new User(
                     request.FirstName,
                     request.LastName,
-                    request.Email
+                    request.Email,
+                    request.RoleId
                 );
 
             await _userRepository.AddNewAsync(user);

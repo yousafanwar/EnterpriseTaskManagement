@@ -1,5 +1,6 @@
 using EnterpriseTaskManagement.Application.Repositories;
 using EnterpriseTaskManagement.Application.Services;
+using EnterpriseTaskManagement.Application.Services.RoleService;
 using EnterpriseTaskManagement.Application.Services.UserService;
 using EnterpriseTaskManagement.Persistence;
 using EnterpriseTaskManagement.Persistence.Repositories;
@@ -20,6 +21,8 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 // Register Swagger
 builder.Services.AddEndpointsApiExplorer();
