@@ -30,5 +30,12 @@ namespace EnterpriseTaskManagement.Persistence.Repositories
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<User?> GetByEmailAsync(string email)
+        {
+            return await _dbContext.Users
+                .Include(user => user.Role)
+                .FirstOrDefaultAsync(user => user.Email == email);
+        }
     }
 }

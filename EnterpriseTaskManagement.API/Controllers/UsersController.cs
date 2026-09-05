@@ -1,5 +1,7 @@
-﻿using EnterpriseTaskManagement.Application.DTOs.User;
+﻿using EnterpriseTaskManagement.Application.DTOs.Auth;
+using EnterpriseTaskManagement.Application.DTOs.User;
 using EnterpriseTaskManagement.Application.Services.UserService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.CompilerServices;
 
@@ -17,6 +19,7 @@ namespace EnterpriseTaskManagement.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<UserDTO?>> GetUser(int id)
         {
             var user = await _userService.GetUserAsync(id);
@@ -25,6 +28,7 @@ namespace EnterpriseTaskManagement.API.Controllers
         
         
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<UserDTO?>>> GetUsers()
         {
             var users = await _userService.GetUsersAsync();
@@ -41,6 +45,14 @@ namespace EnterpriseTaskManagement.API.Controllers
                     new { id = user.Id },
                     user
                 );
+        }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
+        {
+            var user = await _userService.LoginAsync(request);
+
+            return Ok(user);
         }
     }
 }

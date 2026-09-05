@@ -21,5 +21,9 @@ namespace EnterpriseTaskManagement.Application.DTOs.User
         public string Email { get; set; }
 
         public int RoleId { get; set; }
+
+        [Required]
+        [StringLength(100, MinimumLength = 10)]
+        public string Password { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using EnterpriseTaskManagement.Application.DTOs.User;
+﻿using EnterpriseTaskManagement.Application.DTOs.Auth;
+using EnterpriseTaskManagement.Application.DTOs.User;
 using EnterpriseTaskManagement.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -11,5 +12,6 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
         Task<UserDTO?> GetUserAsync(int id);
         Task<IEnumerable<UserDTO?>> GetUsersAsync();
         Task<UserDTO> AddUserAsync(CreateUserRequest request);
+        Task<LoginResponse> LoginAsync(LoginRequest request);
     }
 }
