@@ -3,7 +3,6 @@ using EnterpriseTaskManagement.Application.DTOs.User;
 using EnterpriseTaskManagement.Application.Services.UserService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.CompilerServices;
 
 namespace EnterpriseTaskManagement.API.Controllers
 {
@@ -28,7 +27,7 @@ namespace EnterpriseTaskManagement.API.Controllers
         
         
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<UserDTO?>>> GetUsers()
         {
             var users = await _userService.GetUsersAsync();
