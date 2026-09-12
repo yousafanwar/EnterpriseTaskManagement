@@ -53,5 +53,13 @@ namespace EnterpriseTaskManagement.API.Controllers
 
             return Ok(user);
         }
+
+        [HttpPost("refresh")]
+        public async Task<ActionResult<LoginResponse>> RefreshToken(RefreshTokenRequest request)
+        {
+                var response = await _userService.RefreshTokenAsync(request);
+
+                return Ok(response);
+        }
     }
 }

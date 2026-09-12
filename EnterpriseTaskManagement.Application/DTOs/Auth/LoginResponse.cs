@@ -1,8 +1,12 @@
-﻿namespace EnterpriseTaskManagement.Application.DTOs.Auth
+﻿using EnterpriseTaskManagement.Domain.Entities;
+
+namespace EnterpriseTaskManagement.Application.DTOs.Auth
 {
     public class LoginResponse
     {
-        public string Token { get; set; } = string.Empty;
-        public DateTime ExpiresAt { get; set; }
+        public string AccessToken { get; set; } = string.Empty;
+        public DateTime AccessTokenExpiresAt { get; set; }
+        public string RefreshToken { get; set; }
+        public DateTime RefreshTokenExpiresAt { get; set; }
     }
 }

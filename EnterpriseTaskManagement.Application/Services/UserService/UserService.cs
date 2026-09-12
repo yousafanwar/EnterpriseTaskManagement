@@ -1,6 +1,7 @@
 ﻿using EnterpriseTaskManagement.Application.DTOs.Auth;
 using EnterpriseTaskManagement.Application.DTOs.User;
 using EnterpriseTaskManagement.Application.Repositories;
+using EnterpriseTaskManagement.Application.Services.AuthService;
 using EnterpriseTaskManagement.Application.Services.Interfaces;
 using EnterpriseTaskManagement.Domain.Entities;
 
@@ -10,14 +11,20 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
     {
         private readonly IUserRepository _userRepository;
         private readonly IJwtTokenService _jwtTokenService;
+        private readonly IRefreshTokenService _refreshTokenService;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
 
         public UserService(
             IUserRepository UserRepository,
-            IJwtTokenService jwtTokenService
+            IJwtTokenService jwtTokenService,
+            IRefreshTokenService refreshTokenService,
+            IRefreshTokenRepository refreshTokenRepository
             )
         {
             _userRepository = UserRepository;
             _jwtTokenService = jwtTokenService;
+            _refreshTokenService = refreshTokenService;
+            _refreshTokenRepository = refreshTokenRepository;
         }
 
         public async Task<UserDTO?> GetUserAsync(int id)
@@ -92,13 +99,53 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
                 throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
-            var token = _jwtTokenService.GenerateToken(user);
+            var accessToken = _jwtTokenService.GenerateToken(user);
+            var refreshToken = _refreshTokenService.GenerateRefreshToken();
+            var refreshTokenHash = _refreshTokenService.HashRefreshToken(refreshToken);
 
+            var refreshTokenEntity = new RefreshToken(
+                    refreshTokenHash,
+                    DateTime.UtcNow.AddDays(7),
+                    user.Id
+                );
+
+            await _refreshTokenRepository.AddAsync(refreshTokenEntity);
 
             return new LoginResponse
             {
-                Token = token,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(60)
+                AccessToken = accessToken,
+                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(60),
+                RefreshToken = refreshToken,
+                RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7)
+            };
+        }
+
+        public async Task<LoginResponse> RefreshTokenAsync(RefreshTokenRequest request)
+        {
+            var refreshTokenHash = _refreshTokenService.HashRefreshToken(request.RefreshToken);
+
+            var storedToken = await _refreshTokenRepository.GetByTokenHashAsync(refreshTokenHash);
+
+            if (storedToken == null)
+            {
+                throw new UnauthorizedAccessException("Invalid refresh token.");
+            }
+
+            if (storedToken.ExpiresAt <= DateTime.UtcNow)
+            {
+                throw new UnauthorizedAccessException("Refresh token has expired.");
+            }
+
+            var user = storedToken.User;
+
+            var accessToken = _jwtTokenService.GenerateToken(user);
+
+            return new LoginResponse
+            {
+                AccessToken = accessToken,
+                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(60),
+                RefreshToken = request.RefreshToken,
+                RefreshTokenExpiresAt = storedToken.ExpiresAt
             };
         }
     }

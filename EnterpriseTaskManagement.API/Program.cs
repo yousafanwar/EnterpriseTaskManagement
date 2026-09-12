@@ -1,5 +1,6 @@
 using EnterpriseTaskManagement.Application.Repositories;
 using EnterpriseTaskManagement.Application.Services;
+using EnterpriseTaskManagement.Application.Services.AuthService;
 using EnterpriseTaskManagement.Application.Services.Interfaces;
 using EnterpriseTaskManagement.Application.Services.RoleService;
 using EnterpriseTaskManagement.Application.Services.UserService;
@@ -28,6 +29,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 // Register Swagger
 builder.Services.AddEndpointsApiExplorer();
