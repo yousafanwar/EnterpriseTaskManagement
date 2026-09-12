@@ -120,11 +120,14 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
             };
         }
 
-        public async Task<LoginResponse> RefreshTokenAsync(RefreshTokenRequest request)
+        public async Task<LoginResponse> RefreshTokenAsync(
+            RefreshTokenRequest request)
         {
-            var refreshTokenHash = _refreshTokenService.HashRefreshToken(request.RefreshToken);
+            var refreshTokenHash =
+                _refreshTokenService.HashRefreshToken(request.RefreshToken);
 
-            var storedToken = await _refreshTokenRepository.GetByTokenHashAsync(refreshTokenHash);
+            var storedToken =
+                await _refreshTokenRepository.GetByTokenHashAsync(refreshTokenHash);
 
             if (storedToken == null)
             {
@@ -138,14 +141,35 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
 
             var user = storedToken.User;
 
+            // Revoke old refresh token
+            storedToken.Revoke();
+
+            await _refreshTokenRepository.UpdateAsync(storedToken);
+
+            // Generate new refresh token
+            var newRefreshToken =
+                _refreshTokenService.GenerateRefreshToken();
+
+            var newRefreshTokenHash =
+                _refreshTokenService.HashRefreshToken(newRefreshToken);
+
+            var newRefreshTokenEntity = new RefreshToken(
+                newRefreshTokenHash,
+                DateTime.UtcNow.AddDays(7),
+                user.Id
+            );
+
+            await _refreshTokenRepository.AddAsync(newRefreshTokenEntity);
+
+            // Generate new access token
             var accessToken = _jwtTokenService.GenerateToken(user);
 
             return new LoginResponse
             {
                 AccessToken = accessToken,
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(60),
-                RefreshToken = request.RefreshToken,
-                RefreshTokenExpiresAt = storedToken.ExpiresAt
+                RefreshToken = newRefreshToken,
+                RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7)
             };
         }
     }

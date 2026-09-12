@@ -26,5 +26,10 @@ namespace EnterpriseTaskManagement.Persistence.Repositories
                 .ThenInclude(u => u.Role)
                 .FirstOrDefaultAsync(r => r.TokenHash == tokenHash && !r.Revoked);
         }
+        public async Task UpdateAsync(RefreshToken refreshToken)
+        {
+            _context.RefreshTokens.Update(refreshToken);
+            await _context.SaveChangesAsync();
+        }
     }
 }

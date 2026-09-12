@@ -6,5 +6,6 @@ namespace EnterpriseTaskManagement.Application.Repositories
     {
         Task AddAsync(RefreshToken refreshToken);
         Task<RefreshToken?> GetByTokenHashAsync(string tokenHash);
+        Task UpdateAsync(RefreshToken refreshToken);
     }
 }
