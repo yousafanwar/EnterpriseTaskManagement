@@ -22,6 +22,36 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -133,6 +163,25 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.Comment", b =>
+                {
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.TaskItem", "Task")
+                        .WithMany("Comments")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.User", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Task");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.RefreshToken", b =>
                 {
                     b.HasOne("EnterpriseTaskManagement.Domain.Entities.User", "User")
@@ -165,8 +214,15 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.TaskItem", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.User", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618

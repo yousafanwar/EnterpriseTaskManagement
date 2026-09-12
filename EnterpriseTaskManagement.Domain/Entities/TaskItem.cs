@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using EnterpriseTaskManagement.Domain.Enums;
+﻿using EnterpriseTaskManagement.Domain.Enums;
 
 namespace EnterpriseTaskManagement.Domain.Entities
 {
@@ -13,8 +10,9 @@ namespace EnterpriseTaskManagement.Domain.Entities
         public TaskItemStatus Status { get; private set; }
         public int? AssigneeId { get; private set; }
         public User? Assignee { get; private set; }
+        public ICollection<Comment> Comments { get; private set; } = new List<Comment>();
 
-        private TaskItem () 
+            private TaskItem () 
         { 
         }
 
