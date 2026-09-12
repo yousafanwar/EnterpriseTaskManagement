@@ -123,11 +123,9 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
         public async Task<LoginResponse> RefreshTokenAsync(
             RefreshTokenRequest request)
         {
-            var refreshTokenHash =
-                _refreshTokenService.HashRefreshToken(request.RefreshToken);
+            var refreshTokenHash = _refreshTokenService.HashRefreshToken(request.RefreshToken);
 
-            var storedToken =
-                await _refreshTokenRepository.GetByTokenHashAsync(refreshTokenHash);
+            var storedToken = await _refreshTokenRepository.GetByTokenHashAsync(refreshTokenHash);
 
             if (storedToken == null)
             {
@@ -147,11 +145,9 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
             await _refreshTokenRepository.UpdateAsync(storedToken);
 
             // Generate new refresh token
-            var newRefreshToken =
-                _refreshTokenService.GenerateRefreshToken();
+            var newRefreshToken = _refreshTokenService.GenerateRefreshToken();
 
-            var newRefreshTokenHash =
-                _refreshTokenService.HashRefreshToken(newRefreshToken);
+            var newRefreshTokenHash = _refreshTokenService.HashRefreshToken(newRefreshToken);
 
             var newRefreshTokenEntity = new RefreshToken(
                 newRefreshTokenHash,
@@ -171,6 +167,22 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
                 RefreshToken = newRefreshToken,
                 RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7)
             };
+        }
+
+        public async Task LogoutAsync(string refreshToken)
+        {
+            var refreshTokenHash = _refreshTokenService.HashRefreshToken(refreshToken);
+
+            var storedToken = await _refreshTokenRepository.GetByTokenHashAsync(refreshTokenHash);
+
+            if (storedToken == null)
+            {
+                return;
+            }
+
+            storedToken.Revoke();
+
+            await _refreshTokenRepository.UpdateAsync(storedToken);
         }
     }
 }

@@ -61,5 +61,13 @@ namespace EnterpriseTaskManagement.API.Controllers
 
                 return Ok(response);
         }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout(RefreshTokenRequest request)
+        {
+            await _userService.LogoutAsync(request.RefreshToken);
+
+            return NoContent();
+        }
     }
 }
