@@ -11,8 +11,9 @@ namespace EnterpriseTaskManagement.Domain.Entities
         public int? AssigneeId { get; private set; }
         public User? Assignee { get; private set; }
         public ICollection<Comment> Comments { get; private set; } = new List<Comment>();
+        public ICollection<TaskHistory> History { get; private set; } = new List<TaskHistory>();
 
-            private TaskItem () 
+        private TaskItem () 
         { 
         }
 

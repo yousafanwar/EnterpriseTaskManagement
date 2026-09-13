@@ -100,6 +100,42 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.TaskHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NewValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TaskHistories");
+                });
+
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.TaskItem", b =>
                 {
                     b.Property<int>("Id")
@@ -193,6 +229,25 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.TaskHistory", b =>
+                {
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.TaskItem", "Task")
+                        .WithMany("History")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.User", "User")
+                        .WithMany("TaskHistories")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Task");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.TaskItem", b =>
                 {
                     b.HasOne("EnterpriseTaskManagement.Domain.Entities.User", "Assignee")
@@ -217,6 +272,8 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.TaskItem", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("History");
                 });
 
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.User", b =>
@@ -224,6 +281,8 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("TaskHistories");
                 });
 #pragma warning restore 612, 618
         }

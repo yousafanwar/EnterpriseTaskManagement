@@ -18,6 +18,7 @@ namespace EnterpriseTaskManagement.Persistence
         public DbSet<Role> Roles { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<TaskHistory> TaskHistories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,6 +50,18 @@ namespace EnterpriseTaskManagement.Persistence
                 .HasOne(c => c.User)
                 .WithMany(u => u.Comments)
                 .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TaskHistory>()
+                .HasOne(h => h.Task)
+                .WithMany(t => t.History)
+                .HasForeignKey(h => h.TaskId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TaskHistory>()
+                .HasOne(h => h.User)
+                .WithMany(u => u.TaskHistories)
+                .HasForeignKey(h => h.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
