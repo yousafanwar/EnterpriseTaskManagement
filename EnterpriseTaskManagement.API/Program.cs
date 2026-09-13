@@ -1,4 +1,5 @@
 using EnterpriseTaskManagement.Application.Interfaces.Repositories;
+using EnterpriseTaskManagement.Application.Interfaces.Services;
 using EnterpriseTaskManagement.Application.Repositories;
 using EnterpriseTaskManagement.Application.Services;
 using EnterpriseTaskManagement.Application.Services.AuthService;
@@ -36,6 +37,7 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ITaskHistoryRepository, TaskHistoryRepository>();
+builder.Services.AddScoped<ITaskHistoryService, TaskHistoryService>();
 
 // Register Swagger
 builder.Services.AddEndpointsApiExplorer();
