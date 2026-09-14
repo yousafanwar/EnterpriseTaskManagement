@@ -6,7 +6,7 @@ namespace EnterpriseTaskManagement.Application.Interfaces.Services
     {
         Task AddHistoryAsync(
             int taskId,
-            int userId,
+            int? userId,
             string action,
             string? oldValue = null,
             string? newValue = null);

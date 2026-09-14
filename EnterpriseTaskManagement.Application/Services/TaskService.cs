@@ -1,4 +1,5 @@
 ﻿using EnterpriseTaskManagement.Application.DTOs;
+using EnterpriseTaskManagement.Application.Interfaces.Services;
 using EnterpriseTaskManagement.Application.Repositories;
 using EnterpriseTaskManagement.Domain.Entities;
 using System;
@@ -11,14 +12,17 @@ namespace EnterpriseTaskManagement.Application.Services
     {
         private readonly ITaskRepository _repository;
         private readonly IUserRepository _userRepository;
+        private readonly ITaskHistoryService _taskHistoryService;
 
         public TaskService (
             ITaskRepository repository,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            ITaskHistoryService taskHistoryService
             )
         {
             _repository = repository;
             _userRepository = userRepository;
+            _taskHistoryService = taskHistoryService;
         }
 
         public async Task<TaskItemDto?> GetTaskAsync(int id)
@@ -47,6 +51,11 @@ namespace EnterpriseTaskManagement.Application.Services
                 );            
             
             await _repository.AddTask(task);
+
+            await _taskHistoryService.AddHistoryAsync(
+                task.Id,
+                null,
+                "Created");
 
             return new TaskItemDto
             {

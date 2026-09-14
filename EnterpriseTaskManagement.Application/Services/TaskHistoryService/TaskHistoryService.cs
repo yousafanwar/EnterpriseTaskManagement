@@ -16,7 +16,7 @@ namespace EnterpriseTaskManagement.Application.Services
 
         public async Task AddHistoryAsync(
             int taskId,
-            int userId,
+            int? userId,
             string action,
             string? oldValue = null,
             string? newValue = null)
@@ -40,7 +40,9 @@ namespace EnterpriseTaskManagement.Application.Services
                 Id = h.Id,
                 TaskId = h.TaskId,
                 UserId = h.UserId,
-                UserName = $"{h.User.FirstName} {h.User.LastName}",
+                UserName = h.User == null
+                    ? "System"
+                    : $"{h.User.FirstName} {h.User.LastName}",
                 Action = h.Action,
                 OldValue = h.OldValue,
                 NewValue = h.NewValue,

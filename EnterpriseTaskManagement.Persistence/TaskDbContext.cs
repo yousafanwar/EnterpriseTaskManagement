@@ -62,7 +62,7 @@ namespace EnterpriseTaskManagement.Persistence
                 .HasOne(h => h.User)
                 .WithMany(u => u.TaskHistories)
                 .HasForeignKey(h => h.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

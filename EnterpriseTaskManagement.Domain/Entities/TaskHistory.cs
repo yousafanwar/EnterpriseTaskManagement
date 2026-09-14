@@ -7,8 +7,8 @@
         public int TaskId { get; private set; }
         public TaskItem Task { get; private set; } = null!;
 
-        public int UserId { get; private set; }
-        public User User { get; private set; } = null!;
+        public int? UserId { get; private set; }
+        public User? User { get; private set; } = null!;
 
         public string Action { get; private set; } = string.Empty;
 
@@ -24,7 +24,7 @@
 
         public TaskHistory(
             int taskId,
-            int userId,
+            int? userId,
             string action,
             string? oldValue,
             string? newValue)

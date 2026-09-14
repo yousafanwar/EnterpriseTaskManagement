@@ -73,7 +73,7 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -124,7 +124,7 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.Property<int>("TaskId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -223,8 +223,7 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.HasOne("EnterpriseTaskManagement.Domain.Entities.User", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });
@@ -240,8 +239,7 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.HasOne("EnterpriseTaskManagement.Domain.Entities.User", "User")
                         .WithMany("TaskHistories")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Task");
 
