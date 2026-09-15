@@ -128,7 +128,7 @@ namespace EnterpriseTaskManagement.Application.Services
             return true;
         }
 
-        public async Task<TaskItemDto?> AssignTaskAsync(int taskId, int userId)
+        public async Task<TaskItemDto?> AssignTaskAsync(int taskId, int userId, int actorUserId)
         {
             var task = await _repository.GetByIdAsync(taskId);
 
@@ -144,9 +144,19 @@ namespace EnterpriseTaskManagement.Application.Services
                 return null;
             }
 
+            var oldUserId = task.AssigneeId;
+
             task.AssignTo(userId);
 
             await _repository.UpdateAsync(task);
+
+            await _taskHistoryService.AddHistoryAsync(
+                task.Id,
+                actorUserId,
+                "Assigned",
+                oldUserId?.ToString(),
+                userId.ToString()
+            );
 
             return new TaskItemDto
             {
@@ -157,7 +167,7 @@ namespace EnterpriseTaskManagement.Application.Services
             };                
         }
 
-        public async Task<TaskItemDto?> StartTaskAsync(int id)
+        public async Task<TaskItemDto?> StartTaskAsync(int id, int actorUserId)
         {
             var task = await _repository.GetByIdAsync(id);
 
@@ -166,9 +176,18 @@ namespace EnterpriseTaskManagement.Application.Services
                 return null;
             }
 
+            var oldStatus = task.Status;
+
             task.Start();
 
             await _repository.UpdateAsync(task);
+
+            await _taskHistoryService.AddHistoryAsync(
+                task.Id,
+                actorUserId,
+                "StatusChanged",
+                oldStatus.ToString(),
+                task.Status.ToString());
 
             return new TaskItemDto
             {
@@ -179,7 +198,7 @@ namespace EnterpriseTaskManagement.Application.Services
             };
         }
 
-        public async Task<TaskItemDto?> CompleteTaskAsync(int id)
+        public async Task<TaskItemDto?> CompleteTaskAsync(int id, int actorUserId)
         {
             var task = await _repository.GetByIdAsync(id);
 
@@ -188,9 +207,18 @@ namespace EnterpriseTaskManagement.Application.Services
                 return null;
             }
 
+            var oldStatus = task.Status;
+
             task.Complete();
 
             await _repository.UpdateAsync(task);
+
+            await _taskHistoryService.AddHistoryAsync(
+                task.Id,
+                actorUserId,
+                "StatusChanged",
+                oldStatus.ToString(),
+                task.Status.ToString());
 
             return new TaskItemDto
             {

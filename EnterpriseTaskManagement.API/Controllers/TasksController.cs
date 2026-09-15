@@ -1,6 +1,7 @@
 ﻿using EnterpriseTaskManagement.Application.Services;
 using EnterpriseTaskManagement.Domain.Entities;
 using EnterpriseTaskManagement.Application.DTOs;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EnterpriseTaskManagement.API.Controllers;
@@ -78,7 +79,11 @@ public class TasksController : ControllerBase
     [HttpPut("{taskId}/assign/{userId}")]
     public async Task<ActionResult<TaskItemDto?>> AssignTask(int taskId, int userId)
     {
-        var task = await _taskService.AssignTaskAsync(taskId, userId);
+        var actorUserId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!
+        );
+
+        var task = await _taskService.AssignTaskAsync(taskId, userId, actorUserId);
 
         if(task == null)
         {
@@ -91,7 +96,11 @@ public class TasksController : ControllerBase
     [HttpPut("{id}/start")]
     public async Task<ActionResult<TaskItemDto?>> StartTask(int id)
     {
-        var task = await _taskService.StartTaskAsync(id);
+        var actorUserId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!
+        );
+
+        var task = await _taskService.StartTaskAsync(id, actorUserId);
         
         if (task == null)
         {
@@ -104,7 +113,11 @@ public class TasksController : ControllerBase
     [HttpPut("{id}/complete")]
     public async Task<ActionResult<TaskItemDto?>> CompleteTask(int id)
     {
-        var task = await _taskService.CompleteTaskAsync(id);
+        var actorUserId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!
+        );
+
+        var task = await _taskService.CompleteTaskAsync(id, actorUserId);
 
         if (task == null)
         {

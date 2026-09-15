@@ -14,8 +14,8 @@ namespace EnterpriseTaskManagement.Application.Services
         Task<PagedResult<TaskItemDto>> GetTasksAsync(TaskQueryRequest request);
         Task<TaskItemDto?> UpdateTaskAsync(int id, UpdateTaskRequest request);
         Task<bool> DeleteTaskAsync(int id);
-        Task<TaskItemDto?> AssignTaskAsync(int taskId, int userId);
-        Task<TaskItemDto?> StartTaskAsync(int id);
-        Task<TaskItemDto?> CompleteTaskAsync(int id);
+        Task<TaskItemDto?> AssignTaskAsync(int taskId, int userId, int actorUserId);
+        Task<TaskItemDto?> StartTaskAsync(int id, int actorUserId);
+        Task<TaskItemDto?> CompleteTaskAsync(int id, int actorUserId);
     }
 }
