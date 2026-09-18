@@ -54,7 +54,11 @@ public class TasksController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<TaskItemDto>> UpdateTask(int id, UpdateTaskRequest request)
     {
-        var task = await _taskService.UpdateTaskAsync(id, request);
+        var actorUserId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!
+        );
+
+        var task = await _taskService.UpdateTaskAsync(id, request, actorUserId);
 
         if (task == null)
         {
@@ -64,18 +68,6 @@ public class TasksController : ControllerBase
         return Ok(task);
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTask(int id)
-    {
-        var deleted = await _taskService.DeleteTaskAsync(id);
-
-        if (!deleted)
-        {
-            return NotFound();
-        }
-
-        return NoContent();
-    }
     [HttpPut("{taskId}/assign/{userId}")]
     public async Task<ActionResult<TaskItemDto?>> AssignTask(int taskId, int userId)
     {

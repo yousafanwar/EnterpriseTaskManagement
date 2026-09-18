@@ -12,7 +12,7 @@ namespace EnterpriseTaskManagement.Application.Services
         Task<TaskItemDto?> GetTaskAsync(int id);
         Task<TaskItemDto> AddTaskAsync(CreateTaskRequest request);
         Task<PagedResult<TaskItemDto>> GetTasksAsync(TaskQueryRequest request);
-        Task<TaskItemDto?> UpdateTaskAsync(int id, UpdateTaskRequest request);
+        Task<TaskItemDto?> UpdateTaskAsync(int id, UpdateTaskRequest request, int actorUserId);
         Task<bool> DeleteTaskAsync(int id);
         Task<TaskItemDto?> AssignTaskAsync(int taskId, int userId, int actorUserId);
         Task<TaskItemDto?> StartTaskAsync(int id, int actorUserId);

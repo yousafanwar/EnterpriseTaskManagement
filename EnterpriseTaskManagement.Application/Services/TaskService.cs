@@ -90,7 +90,7 @@ namespace EnterpriseTaskManagement.Application.Services
             };
         }
 
-        public async Task <TaskItemDto?> UpdateTaskAsync(int id, UpdateTaskRequest request)
+        public async Task<TaskItemDto?> UpdateTaskAsync(int id, UpdateTaskRequest request, int actorUserId)
         {
             var task = await _repository.GetByIdAsync(id);
 
@@ -99,12 +99,35 @@ namespace EnterpriseTaskManagement.Application.Services
                 return null;
             }
 
+            var oldTitle = task.Title;
+            var oldDescription = task.Description;
+
             task.UpdateDetails(
                 request.Title,
                 request.Description
             );
 
             await _repository.UpdateAsync(task);
+
+            if (oldTitle != task.Title)
+            {
+                await _taskHistoryService.AddHistoryAsync(
+                    task.Id,
+                    actorUserId,
+                    "TitleUpdated",
+                    oldTitle,
+                    task.Title);
+            }
+
+            if (oldDescription != task.Description)
+            {
+                await _taskHistoryService.AddHistoryAsync(
+                    task.Id,
+                    actorUserId,
+                    "DescriptionUpdated",
+                    oldDescription,
+                    task.Description);
+            }
 
             return new TaskItemDto
             {
@@ -114,6 +137,7 @@ namespace EnterpriseTaskManagement.Application.Services
                 Status = task.Status
             };
         }
+
         public async Task<bool> DeleteTaskAsync(int id)
         {
             var task = await _repository.GetByIdAsync(id);
