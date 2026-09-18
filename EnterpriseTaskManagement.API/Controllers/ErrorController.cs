@@ -13,17 +13,45 @@ public class ErrorController : ControllerBase
             .Get<IExceptionHandlerFeature>()?
             .Error;
 
-        if (exception is InvalidOperationException)
+        if (exception is KeyNotFoundException)
         {
-            return BadRequest(new
-            {
-                message = exception.Message
-            });
+            return Problem(
+                statusCode: StatusCodes.Status404NotFound,
+                title: "Resource not found.",
+                detail: exception.Message
+            );
         }
 
-        return StatusCode(500, new
+        if (exception is UnauthorizedAccessException)
         {
-            message = "An unexpected error occurred."
-        });
+            return Problem(
+                statusCode: StatusCodes.Status403Forbidden,
+                title: "Forbidden.",
+                detail: exception.Message
+            );
+        }
+
+        if (exception is InvalidOperationException)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "Invalid operation.",
+                detail: exception.Message
+            );
+        }
+
+        if (exception is ArgumentException)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "Invalid argument.",
+                detail: exception.Message
+            );
+        }
+
+        return Problem(
+            statusCode: StatusCodes.Status500InternalServerError,
+            title: "An unexpected error occurred."
+        );
     }
 }
