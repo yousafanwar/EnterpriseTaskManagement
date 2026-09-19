@@ -2,6 +2,7 @@
 using EnterpriseTaskManagement.Application.Interfaces.Services;
 using EnterpriseTaskManagement.Application.Repositories;
 using EnterpriseTaskManagement.Domain.Entities;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,16 +14,19 @@ namespace EnterpriseTaskManagement.Application.Services
         private readonly ITaskRepository _repository;
         private readonly IUserRepository _userRepository;
         private readonly ITaskHistoryService _taskHistoryService;
+        private readonly ILogger<TaskService> _logger;
 
         public TaskService (
             ITaskRepository repository,
             IUserRepository userRepository,
-            ITaskHistoryService taskHistoryService
+            ITaskHistoryService taskHistoryService,
+            ILogger<TaskService> logger
             )
         {
             _repository = repository;
             _userRepository = userRepository;
             _taskHistoryService = taskHistoryService;
+            _logger = logger;
         }
 
         public async Task<TaskItemDto?> GetTaskAsync(int id)
@@ -56,6 +60,8 @@ namespace EnterpriseTaskManagement.Application.Services
                 task.Id,
                 null,
                 "Created");
+
+            _logger.LogInformation("Task {TaskId} created successfully", task.Id);
 
             return new TaskItemDto
             {
@@ -114,7 +120,7 @@ namespace EnterpriseTaskManagement.Application.Services
                 Status = task.Status
             };
         }
-        public async Task<bool> DeleteTaskAsync(int id)
+        public async Task<bool> DeleteTaskAsync(int id, int userId)
         {
             var task = await _repository.GetByIdAsync(id);
 
@@ -124,6 +130,8 @@ namespace EnterpriseTaskManagement.Application.Services
             }
 
             await _repository.DeleteAsync(task);
+
+            _logger.LogInformation("Task {TaskId} deleted by user {ActorUserId}.", task.Id, userId);
 
             return true;
         }
@@ -158,6 +166,8 @@ namespace EnterpriseTaskManagement.Application.Services
                 userId.ToString()
             );
 
+            _logger.LogInformation("Task {TaskId} has been assigned to {AssignedId} by {AssigneeId}", task.Id, userId, actorUserId);
+
             return new TaskItemDto
             {
                 Id = task.Id,
@@ -189,6 +199,12 @@ namespace EnterpriseTaskManagement.Application.Services
                 oldStatus.ToString(),
                 task.Status.ToString());
 
+            _logger.LogInformation(
+                "Task {TaskId} started by user {ActorUserId}.",
+                task.Id,
+                actorUserId
+            );
+
             return new TaskItemDto
             {
                 Id = task.Id,
@@ -219,6 +235,12 @@ namespace EnterpriseTaskManagement.Application.Services
                 "StatusChanged",
                 oldStatus.ToString(),
                 task.Status.ToString());
+
+            _logger.LogInformation(
+                "Task {TaskId} completed by user {ActorUserId}.",
+                task.Id,
+                actorUserId
+            );
 
             return new TaskItemDto
             {

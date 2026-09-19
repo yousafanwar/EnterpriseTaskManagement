@@ -67,7 +67,11 @@ public class TasksController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTask(int id)
     {
-        var deleted = await _taskService.DeleteTaskAsync(id);
+        var actorUserId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!
+        );
+
+        var deleted = await _taskService.DeleteTaskAsync(id, actorUserId);
 
         if (!deleted)
         {

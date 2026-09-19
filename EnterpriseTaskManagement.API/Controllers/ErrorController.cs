@@ -6,6 +6,13 @@ namespace EnterpriseTaskManagement.API.Controllers;
 [ApiController]
 public class ErrorController : ControllerBase
 {
+    private readonly ILogger<ErrorController> _logger;
+
+    public ErrorController(ILogger<ErrorController> logger)
+    {
+        _logger = logger;
+    }
+
     [Route("/error")]
     public IActionResult Error()
     {
@@ -15,6 +22,11 @@ public class ErrorController : ControllerBase
 
         if (exception is KeyNotFoundException)
         {
+            _logger.LogWarning(
+                exception,
+                "Resource not found."
+            );
+
             return Problem(
                 statusCode: StatusCodes.Status404NotFound,
                 title: "Resource not found.",
@@ -24,6 +36,11 @@ public class ErrorController : ControllerBase
 
         if (exception is UnauthorizedAccessException)
         {
+            _logger.LogWarning(
+                exception,
+                "Unauthorized access attempt."
+            );
+
             return Problem(
                 statusCode: StatusCodes.Status403Forbidden,
                 title: "Forbidden.",
@@ -33,6 +50,11 @@ public class ErrorController : ControllerBase
 
         if (exception is InvalidOperationException)
         {
+            _logger.LogWarning(
+                exception,
+                "Invalid operation."
+            );
+
             return Problem(
                 statusCode: StatusCodes.Status400BadRequest,
                 title: "Invalid operation.",
@@ -42,12 +64,24 @@ public class ErrorController : ControllerBase
 
         if (exception is ArgumentException)
         {
+            _logger.LogWarning(
+                exception,
+                "Invalid argument."
+            );
+
             return Problem(
                 statusCode: StatusCodes.Status400BadRequest,
                 title: "Invalid argument.",
                 detail: exception.Message
             );
         }
+
+        _logger.LogError(
+            exception,
+            "Unhandled exception occurred while processing {Method} {Path}.",
+            HttpContext.Request.Method,
+            HttpContext.Request.Path
+        );
 
         return Problem(
             statusCode: StatusCodes.Status500InternalServerError,
