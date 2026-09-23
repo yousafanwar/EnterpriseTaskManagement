@@ -361,3 +361,27 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# ETMP Secrets
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# ASP.NET local development settings
+appsettings.Development.json
+
+# Docker local overrides
+docker-compose.override.yml
+
+# Local Docker / deployment files
+*.local.yml
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
