@@ -1,8 +1,8 @@
 <Solution>
-  <Project Path="D:/Private Sources/EnterpriseTaskManagement/EnterpriseTaskManagement.API/EnterpriseTaskManagement.API.csproj" />
-  <Project Path="D:/Private Sources/EnterpriseTaskManagement/EnterpriseTaskManagement.Application/EnterpriseTaskManagement.Application.csproj" />
-  <Project Path="D:/Private Sources/EnterpriseTaskManagement/EnterpriseTaskManagement.Domain/EnterpriseTaskManagement.Domain.csproj" />
-  <Project Path="D:/Private Sources/EnterpriseTaskManagement/EnterpriseTaskManagement.Infrastructure/EnterpriseTaskManagement.Infrastructure.csproj" />
-  <Project Path="D:/Private Sources/EnterpriseTaskManagement/EnterpriseTaskManagement.Persistence/EnterpriseTaskManagement.Persistence.csproj" />
-  <Project Path="D:/Private Sources/EnterpriseTaskManagement/EnterpriseTaskManagement.Tests/EnterpriseTaskManagement.Tests.csproj" />
+  <Project Path="EnterpriseTaskManagement.API/EnterpriseTaskManagement.API.csproj" />
+  <Project Path="EnterpriseTaskManagement.Application/EnterpriseTaskManagement.Application.csproj" />
+  <Project Path="EnterpriseTaskManagement.Domain/EnterpriseTaskManagement.Domain.csproj" />
+  <Project Path="EnterpriseTaskManagement.Infrastructure/EnterpriseTaskManagement.Infrastructure.csproj" />
+  <Project Path="EnterpriseTaskManagement.Persistence/EnterpriseTaskManagement.Persistence.csproj" />
+  <Project Path="EnterpriseTaskManagement.Tests/EnterpriseTaskManagement.Tests.csproj" />
 </Solution>
