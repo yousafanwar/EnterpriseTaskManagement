@@ -49,23 +49,74 @@ namespace EnterpriseTaskManagement.API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
         {
-            var user = await _userService.LoginAsync(request);
+            var result = await _userService.LoginAsync(request);
 
-            return Ok(user);
+            Response.Cookies.Append(
+                "refreshToken",
+                result.RefreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = result.RefreshTokenExpiresAt,
+                    Path = "/api/users"
+                });
+
+            return Ok(new LoginResponse
+            {
+                AccessToken = result.AccessToken,
+                AccessTokenExpiresAt = result.AccessTokenExpiresAt
+            });
         }
 
         [HttpPost("refresh")]
-        public async Task<ActionResult<LoginResponse>> RefreshToken(RefreshTokenRequest request)
+        public async Task<ActionResult<LoginResponse>> RefreshToken()
         {
-                var response = await _userService.RefreshTokenAsync(request);
+            var refreshToken = Request.Cookies["refreshToken"];
 
-                return Ok(response);
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                throw new UnauthorizedAccessException("Refresh token is missing.");
+            }
+
+            var result = await _userService.RefreshTokenAsync(refreshToken);
+
+            Response.Cookies.Append(
+                "refreshToken",
+                result.RefreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = result.RefreshTokenExpiresAt,
+                    Path = "/api/users"
+                });
+
+            return Ok(new LoginResponse
+            {
+                AccessToken = result.AccessToken,
+                AccessTokenExpiresAt = result.AccessTokenExpiresAt
+            });
         }
 
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout(RefreshTokenRequest request)
+        public async Task<IActionResult> Logout()
         {
-            await _userService.LogoutAsync(request.RefreshToken);
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            if (!string.IsNullOrEmpty(refreshToken))
+            {
+                await _userService.LogoutAsync(refreshToken);
+            }
+
+            Response.Cookies.Delete(
+                "refreshToken",
+                new CookieOptions
+                {
+                    Path = "/api/users"
+                });
 
             return NoContent();
         }

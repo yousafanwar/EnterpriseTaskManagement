@@ -12,8 +12,8 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
         Task<UserDTO?> GetUserAsync(int id);
         Task<IEnumerable<UserDTO?>> GetUsersAsync();
         Task<UserDTO> AddUserAsync(CreateUserRequest request);
-        Task<LoginResponse> LoginAsync(LoginRequest request);
-        Task<LoginResponse> RefreshTokenAsync(RefreshTokenRequest request);
+        Task<LoginResult> LoginAsync(LoginRequest request);
+        Task<LoginResult> RefreshTokenAsync(string request);
         Task LogoutAsync(string refreshToken);
     }
 }

@@ -80,7 +80,7 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
             };
 
         }
-        public async Task<LoginResponse> LoginAsync(LoginRequest request)
+        public async Task<LoginResult> LoginAsync(LoginRequest request)
         {
             var user = await _userRepository.GetByEmailAsync(request.Email);
 
@@ -111,7 +111,7 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
 
             await _refreshTokenRepository.AddAsync(refreshTokenEntity);
 
-            return new LoginResponse
+            return new LoginResult
             {
                 AccessToken = accessToken,
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(60),
@@ -120,10 +120,9 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
             };
         }
 
-        public async Task<LoginResponse> RefreshTokenAsync(
-            RefreshTokenRequest request)
+        public async Task<LoginResult> RefreshTokenAsync(string refreshToken)
         {
-            var refreshTokenHash = _refreshTokenService.HashRefreshToken(request.RefreshToken);
+            var refreshTokenHash = _refreshTokenService.HashRefreshToken(refreshToken);
 
             var storedToken = await _refreshTokenRepository.GetByTokenHashAsync(refreshTokenHash);
 
@@ -160,7 +159,7 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
             // Generate new access token
             var accessToken = _jwtTokenService.GenerateToken(user);
 
-            return new LoginResponse
+            return new LoginResult
             {
                 AccessToken = accessToken,
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(60),
@@ -171,9 +170,11 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
 
         public async Task LogoutAsync(string refreshToken)
         {
-            var refreshTokenHash = _refreshTokenService.HashRefreshToken(refreshToken);
+            var refreshTokenHash =
+                _refreshTokenService.HashRefreshToken(refreshToken);
 
-            var storedToken = await _refreshTokenRepository.GetByTokenHashAsync(refreshTokenHash);
+            var storedToken =
+                await _refreshTokenRepository.GetByTokenHashAsync(refreshTokenHash);
 
             if (storedToken == null)
             {
