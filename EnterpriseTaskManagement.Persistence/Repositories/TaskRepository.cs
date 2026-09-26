@@ -18,7 +18,9 @@ public class TaskRepository : ITaskRepository
 
     public async Task<TaskItem?> GetByIdAsync(int id)
     {
-        return await _dbContext.Tasks.FindAsync(id);
+        return await _dbContext.Tasks.
+            Include(task => task.Assignee)
+            .FirstOrDefaultAsync(task => task.Id == id);
     }
 
     public async Task AddTask(TaskItem task)
@@ -31,8 +33,10 @@ public class TaskRepository : ITaskRepository
     {
         //return await _dbContext.Tasks.ToListAsync();
 
-        var query = _dbContext.Tasks.AsQueryable();
-        
+        var query = _dbContext.Tasks
+            .Include(task => task.Assignee)
+            .AsQueryable();
+
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
             query = query.Where(task =>

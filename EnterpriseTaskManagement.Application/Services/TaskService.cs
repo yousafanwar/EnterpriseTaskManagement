@@ -38,12 +38,26 @@ namespace EnterpriseTaskManagement.Application.Services
                 return null;
             }
 
+            return MapToDto(task);
+        }
+
+        private static TaskItemDto MapToDto(TaskItem task)
+        {
             return new TaskItemDto
             {
                 Id = task.Id,
                 Title = task.Title,
                 Description = task.Description,
-                Status = task.Status
+                Status = task.Status,
+                Assignee = task.Assignee == null
+                    ? null
+                    : new AssigneeDto
+                    {
+                        Id = task.Assignee.Id,
+                        FirstName = task.Assignee.FirstName,
+                        LastName = task.Assignee.LastName,
+                        Email = task.Assignee.Email
+                    }
             };
         }
 
@@ -77,13 +91,7 @@ namespace EnterpriseTaskManagement.Application.Services
         {
             var result = await _repository.GetAllAsync(request);
 
-            var tasks = result.Tasks.Select(task => new TaskItemDto
-            {
-                Id = task.Id,
-                Title = task.Title,
-                Description = task.Description,
-                Status = task.Status
-            });
+            var tasks = result.Tasks.Select(MapToDto);
 
             return new PagedResult<TaskItemDto>
             {
@@ -168,13 +176,7 @@ namespace EnterpriseTaskManagement.Application.Services
 
             _logger.LogInformation("Task {TaskId} has been assigned to {AssignedId} by {AssigneeId}", task.Id, userId, actorUserId);
 
-            return new TaskItemDto
-            {
-                Id = task.Id,
-                Title = task.Title,
-                Description = task.Description,
-                Status = task.Status
-            };                
+            return MapToDto(task);
         }
 
         public async Task<TaskItemDto?> StartTaskAsync(int id, int actorUserId)

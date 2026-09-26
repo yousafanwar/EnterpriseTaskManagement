@@ -27,7 +27,7 @@ namespace EnterpriseTaskManagement.API.Controllers
         
         
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<UserDTO?>>> GetUsers()
         {
             var users = await _userService.GetUsersAsync();
