@@ -15,6 +15,7 @@
         public ICollection<ProjectSkill> ProjectSkills { get; private set; } = new List<ProjectSkill>();
 
         public ICollection<ProjectUser> ProjectUsers { get; private set; } = new List<ProjectUser>();
+        public ICollection<TaskItem> Tasks { get; private set; } = new List<TaskItem>();
 
         private Project()
         {

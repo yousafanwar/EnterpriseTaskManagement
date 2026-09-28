@@ -13,5 +13,8 @@ namespace EnterpriseTaskManagement.Application.DTOs
         [Required]
         [StringLength(500)]
         public string Description { get; set; }
+        
+        [Required]
+        public int ProjectId { get; set; }
     }
 }

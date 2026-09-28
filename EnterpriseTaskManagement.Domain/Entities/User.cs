@@ -17,6 +17,7 @@ namespace EnterpriseTaskManagement.Domain.Entities
         public ICollection<RefreshToken> RefreshTokens { get; private set; } = new List<RefreshToken>();
         public ICollection<Comment> Comments { get; private set; } = new List<Comment>();
         public ICollection<TaskHistory> TaskHistories { get; private set; } = new List<TaskHistory>();
+        public ICollection<UserSkill> UserSkills { get; private set; } = new List<UserSkill>();
         private User()
             {
 

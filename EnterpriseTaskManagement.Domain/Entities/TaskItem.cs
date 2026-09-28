@@ -12,16 +12,19 @@ namespace EnterpriseTaskManagement.Domain.Entities
         public User? Assignee { get; private set; }
         public ICollection<Comment> Comments { get; private set; } = new List<Comment>();
         public ICollection<TaskHistory> History { get; private set; } = new List<TaskHistory>();
+        public int ProjectId { get; private set; }
+        public Project Project { get; private set; }
 
         private TaskItem () 
         { 
         }
 
-        public TaskItem (string title, string description)
+        public TaskItem (string title, string description, int projectId)
         {
             Title = title;
             Description = description;
             Status = TaskItemStatus.Pending;
+            ProjectId = projectId;
         }
 
         public void AssignTo(int userId)

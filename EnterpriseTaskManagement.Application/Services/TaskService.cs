@@ -65,7 +65,8 @@ namespace EnterpriseTaskManagement.Application.Services
         {
             var task = new TaskItem(
                     request.Title,
-                    request.Description
+                    request.Description,
+                    request.ProjectId
                 );            
             
             await _repository.AddTask(task);
