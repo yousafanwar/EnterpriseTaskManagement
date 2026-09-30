@@ -52,6 +52,63 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.Project", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.ProjectSkill", b =>
+                {
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SkillId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProjectId", "SkillId");
+
+                    b.HasIndex("SkillId");
+
+                    b.ToTable("ProjectSkills");
+                });
+
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.ProjectUser", b =>
+                {
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProjectId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ProjectUsers");
+                });
+
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -98,6 +155,26 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.Skill", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Skills");
                 });
 
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.TaskHistory", b =>
@@ -151,6 +228,9 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -161,6 +241,8 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssigneeId");
+
+                    b.HasIndex("ProjectId");
 
                     b.ToTable("Tasks");
                 });
@@ -199,6 +281,21 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.UserSkill", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SkillId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "SkillId");
+
+                    b.HasIndex("SkillId");
+
+                    b.ToTable("UserSkills");
+                });
+
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.Comment", b =>
                 {
                     b.HasOne("EnterpriseTaskManagement.Domain.Entities.TaskItem", "Task")
@@ -214,6 +311,44 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Task");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.ProjectSkill", b =>
+                {
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.Skill", "Skill")
+                        .WithMany("ProjectSkills")
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+
+                    b.Navigation("Skill");
+                });
+
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.ProjectUser", b =>
+                {
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Project");
 
                     b.Navigation("User");
                 });
@@ -253,7 +388,15 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                         .HasForeignKey("AssigneeId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.Project", "Project")
+                        .WithMany("Tasks")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Assignee");
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.User", b =>
@@ -265,6 +408,37 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.UserSkill", b =>
+                {
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.Skill", "Skill")
+                        .WithMany("UserSkills")
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Skill");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.Project", b =>
+                {
+                    b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.Skill", b =>
+                {
+                    b.Navigation("ProjectSkills");
+
+                    b.Navigation("UserSkills");
                 });
 
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.TaskItem", b =>

@@ -40,6 +40,13 @@ builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ITaskHistoryRepository, TaskHistoryRepository>();
 builder.Services.AddScoped<ITaskHistoryService, TaskHistoryService>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IProjectSkillRepository, ProjectSkillRepository>();
+builder.Services.AddScoped<IProjectUserRepository, ProjectUserRepository>();
+builder.Services.AddScoped<IUserSkillRepository, UserSkillRepository>();
+builder.Services.AddScoped<ISkillRepository, SkillRepository>();
+builder.Services.AddScoped<ISkillService, SkillService>();
 
 // Register Swagger
 builder.Services.AddEndpointsApiExplorer();

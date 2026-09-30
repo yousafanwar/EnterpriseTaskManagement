@@ -12,9 +12,6 @@
 
         public DateTime? EndDate { get; private set; }
 
-        public ICollection<ProjectSkill> ProjectSkills { get; private set; } = new List<ProjectSkill>();
-
-        public ICollection<ProjectUser> ProjectUsers { get; private set; } = new List<ProjectUser>();
         public ICollection<TaskItem> Tasks { get; private set; } = new List<TaskItem>();
 
         private Project()
@@ -32,5 +29,19 @@
             StartDate = startDate;
             EndDate = endDate;
         }
+
+        public void UpdateDetails(
+            string name,
+            string description,
+            DateTime startDate,
+            DateTime? endDate)
+        {
+            Name = name;
+            Description = description;
+            StartDate = startDate;
+            EndDate = endDate;
+        }
+
     }
+
 }

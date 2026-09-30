@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using EnterpriseTaskManagement.Domain.Entities;
+﻿using EnterpriseTaskManagement.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace EnterpriseTaskManagement.Persistence
@@ -80,7 +77,7 @@ namespace EnterpriseTaskManagement.Persistence
 
             modelBuilder.Entity<UserSkill>()
                 .HasOne(us => us.User)
-                .WithMany(u => u.UserSkills)
+                .WithMany()
                 .HasForeignKey(us => us.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -96,7 +93,7 @@ namespace EnterpriseTaskManagement.Persistence
 
             modelBuilder.Entity<ProjectSkill>()
                 .HasOne(ps => ps.Project)
-                .WithMany(p => p.ProjectSkills)
+                .WithMany()
                 .HasForeignKey(ps => ps.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -112,7 +109,7 @@ namespace EnterpriseTaskManagement.Persistence
 
             modelBuilder.Entity<ProjectUser>()
                 .HasOne(pu => pu.Project)
-                .WithMany(p => p.ProjectUsers)
+                .WithMany()
                 .HasForeignKey(pu => pu.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
 
