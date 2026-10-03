@@ -9,12 +9,13 @@ namespace EnterpriseTaskManagement.Application.DTOs
     {
         [Required]
         [StringLength(100)]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
         [Required]
         [StringLength(500)]
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
         
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "ProjectId must be a valid existing project id.")]
         public int ProjectId { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace EnterpriseTaskManagement.Application.Repositories
         Task AddTask(TaskItem task);
         Task <(IEnumerable<TaskItem> Tasks, int TotalCount)> GetAllAsync(TaskQueryRequest request);
         Task UpdateAsync(TaskItem task);
+        Task ReloadAssigneeAsync(TaskItem task);
         Task DeleteAsync(TaskItem task);
     }
 }

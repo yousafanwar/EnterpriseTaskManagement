@@ -13,18 +13,21 @@ namespace EnterpriseTaskManagement.Application.Services
     {
         private readonly ITaskRepository _repository;
         private readonly IUserRepository _userRepository;
+        private readonly IProjectRepository _projectRepository;
         private readonly ITaskHistoryService _taskHistoryService;
         private readonly ILogger<TaskService> _logger;
 
         public TaskService (
             ITaskRepository repository,
             IUserRepository userRepository,
+            IProjectRepository projectRepository,
             ITaskHistoryService taskHistoryService,
             ILogger<TaskService> logger
             )
         {
             _repository = repository;
             _userRepository = userRepository;
+            _projectRepository = projectRepository;
             _taskHistoryService = taskHistoryService;
             _logger = logger;
         }
@@ -49,6 +52,8 @@ namespace EnterpriseTaskManagement.Application.Services
                 Title = task.Title,
                 Description = task.Description,
                 Status = task.Status,
+                ProjectId = task.ProjectId,
+                ProjectName = task.Project?.Name ?? string.Empty,
                 Assignee = task.Assignee == null
                     ? null
                     : new AssigneeDto
@@ -63,6 +68,23 @@ namespace EnterpriseTaskManagement.Application.Services
 
         public async Task <TaskItemDto> AddTaskAsync(CreateTaskRequest request)
         {
+            if (request.ProjectId <= 0)
+            {
+                throw new ArgumentException(
+                    "ProjectId is required and must be a valid project id. Create a project first, then pass its id.",
+                    nameof(request.ProjectId)
+                );
+            }
+
+            var project = await _projectRepository.GetByIdAsync(request.ProjectId);
+
+            if (project == null)
+            {
+                throw new KeyNotFoundException(
+                    $"Project with id {request.ProjectId} was not found."
+                );
+            }
+
             var task = new TaskItem(
                     request.Title,
                     request.Description,
@@ -83,7 +105,10 @@ namespace EnterpriseTaskManagement.Application.Services
                 Id = task.Id,
                 Title = task.Title,
                 Description = task.Description,
-                Status = task.Status
+                Status = task.Status,
+                ProjectId = task.ProjectId,
+                ProjectName = project.Name,
+                Assignee = null
             };
         }
 
@@ -121,13 +146,7 @@ namespace EnterpriseTaskManagement.Application.Services
 
             await _repository.UpdateAsync(task);
 
-            return new TaskItemDto
-            {
-                Id = task.Id,
-                Title = task.Title,
-                Description = task.Description,
-                Status = task.Status
-            };
+            return MapToDto(task);
         }
         public async Task<bool> DeleteTaskAsync(int id, int userId)
         {
@@ -166,6 +185,7 @@ namespace EnterpriseTaskManagement.Application.Services
             task.AssignTo(userId);
 
             await _repository.UpdateAsync(task);
+            await _repository.ReloadAssigneeAsync(task);
 
             await _taskHistoryService.AddHistoryAsync(
                 task.Id,
@@ -177,7 +197,16 @@ namespace EnterpriseTaskManagement.Application.Services
 
             _logger.LogInformation("Task {TaskId} has been assigned to {AssignedId} by {AssigneeId}", task.Id, userId, actorUserId);
 
-            return MapToDto(task);
+            var dto = MapToDto(task);
+            // Ensure response includes assignee even if navigation reload is skipped.
+            dto.Assignee ??= new AssigneeDto
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email
+            };
+            return dto;
         }
 
         public async Task<TaskItemDto?> StartTaskAsync(int id, int actorUserId)
@@ -208,13 +237,7 @@ namespace EnterpriseTaskManagement.Application.Services
                 actorUserId
             );
 
-            return new TaskItemDto
-            {
-                Id = task.Id,
-                Title = task.Title,
-                Description = task.Description,
-                Status = task.Status
-            };
+            return MapToDto(task);
         }
 
         public async Task<TaskItemDto?> CompleteTaskAsync(int id, int actorUserId)
@@ -245,13 +268,7 @@ namespace EnterpriseTaskManagement.Application.Services
                 actorUserId
             );
 
-            return new TaskItemDto
-            {
-                Id = task.Id,
-                Title = task.Title,
-                Description = task.Description,
-                Status = task.Status
-            };
+            return MapToDto(task);
 
         }
     }

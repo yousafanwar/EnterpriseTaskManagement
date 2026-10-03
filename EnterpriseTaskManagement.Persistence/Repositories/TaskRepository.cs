@@ -18,8 +18,9 @@ public class TaskRepository : ITaskRepository
 
     public async Task<TaskItem?> GetByIdAsync(int id)
     {
-        return await _dbContext.Tasks.
-            Include(task => task.Assignee)
+        return await _dbContext.Tasks
+            .Include(task => task.Assignee)
+            .Include(task => task.Project)
             .FirstOrDefaultAsync(task => task.Id == id);
     }
 
@@ -35,6 +36,7 @@ public class TaskRepository : ITaskRepository
 
         var query = _dbContext.Tasks
             .Include(task => task.Assignee)
+            .Include(task => task.Project)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(request.Search))
@@ -91,9 +93,15 @@ public class TaskRepository : ITaskRepository
 
     public async Task UpdateAsync(TaskItem task)
     {
-        _dbContext.Tasks.Update(task);
+        // Entity is already tracked from GetByIdAsync. Avoid DbSet.Update(),
+        // which marks the whole graph Modified and can null out AssigneeId
+        // when the Assignee navigation is still null/stale after AssignTo.
         await _dbContext.SaveChangesAsync();
+    }
 
+    public async Task ReloadAssigneeAsync(TaskItem task)
+    {
+        await _dbContext.Entry(task).Reference(t => t.Assignee).LoadAsync();
     }
     public async Task DeleteAsync(TaskItem task)
     {

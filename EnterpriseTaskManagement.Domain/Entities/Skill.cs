@@ -4,7 +4,7 @@
     {
         public int Id { get; private set; }
 
-        public string Name { get; private set; }
+        public string Name { get; private set; } = null!;
 
         public ICollection<UserSkill> UserSkills { get; private set; } = new List<UserSkill>();
 

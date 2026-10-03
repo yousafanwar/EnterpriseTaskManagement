@@ -5,15 +5,15 @@ namespace EnterpriseTaskManagement.Domain.Entities
     public class TaskItem
     {
         public int Id { get; private set; }
-        public string Title { get; private set; }
-        public string Description { get; private set; }
+        public string Title { get; private set; } = null!;
+        public string Description { get; private set; } = null!;
         public TaskItemStatus Status { get; private set; }
         public int? AssigneeId { get; private set; }
         public User? Assignee { get; private set; }
         public ICollection<Comment> Comments { get; private set; } = new List<Comment>();
         public ICollection<TaskHistory> History { get; private set; } = new List<TaskHistory>();
         public int ProjectId { get; private set; }
-        public Project Project { get; private set; }
+        public Project Project { get; private set; } = null!;
 
         private TaskItem () 
         { 
