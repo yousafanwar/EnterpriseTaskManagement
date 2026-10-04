@@ -37,5 +37,27 @@ namespace EnterpriseTaskManagement.Persistence.Repositories
                 .Include(user => user.Role)
                 .FirstOrDefaultAsync(user => user.Email == email);
         }
+
+        public async Task UpdateAsync(User user)
+        {
+            _dbContext.Users.Update(user);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<bool> HasCommentsAsync(int userId)
+        {
+            return await _dbContext.Comments.AnyAsync(comment => comment.UserId == userId);
+        }
+
+        public async Task DeleteAsync(User user)
+        {
+            var memberships = await _dbContext.ProjectUsers
+                .Where(pu => pu.UserId == user.Id)
+                .ToListAsync();
+
+            _dbContext.ProjectUsers.RemoveRange(memberships);
+            _dbContext.Users.Remove(user);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

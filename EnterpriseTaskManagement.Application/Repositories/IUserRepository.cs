@@ -9,5 +9,8 @@ namespace EnterpriseTaskManagement.Application.Repositories
         Task<User?> GetByEmailAsync(string email);
         Task<IEnumerable<User>> GetAllAsync();
         Task AddNewAsync(User user);
+        Task UpdateAsync(User user);
+        Task<bool> HasCommentsAsync(int userId);
+        Task DeleteAsync(User user);
     }
 }

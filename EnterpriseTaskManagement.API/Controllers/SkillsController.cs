@@ -1,4 +1,4 @@
-﻿using EnterpriseTaskManagement.Application.DTOs;
+using EnterpriseTaskManagement.Application.DTOs;
 using EnterpriseTaskManagement.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +37,7 @@ namespace EnterpriseTaskManagement.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<SkillDto>> CreateSkill(
             CreateSkillRequest request)
         {
@@ -49,6 +50,7 @@ namespace EnterpriseTaskManagement.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteSkill(int id)
         {
             var deleted = await _skillService.DeleteSkillAsync(id);

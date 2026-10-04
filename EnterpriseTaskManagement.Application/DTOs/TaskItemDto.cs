@@ -1,4 +1,4 @@
-﻿using EnterpriseTaskManagement.Domain.Enums;
+using EnterpriseTaskManagement.Domain.Enums;
 
 namespace EnterpriseTaskManagement.Application.DTOs
 {

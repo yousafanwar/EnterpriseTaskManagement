@@ -30,5 +30,13 @@ namespace EnterpriseTaskManagement.Domain.Entities
             RoleId = roleId;
             PasswordHash = passwordHash;
         }
+
+        public void Update(string firstName, string lastName, string email, int roleId)
+        {
+            FirstName = firstName;
+            LastName = lastName;
+            Email = email;
+            RoleId = roleId;
+        }
     }
 }
