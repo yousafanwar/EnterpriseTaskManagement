@@ -38,5 +38,10 @@ namespace EnterpriseTaskManagement.Domain.Entities
             Email = email;
             RoleId = roleId;
         }
+
+        public void SetPasswordHash(string passwordHash)
+        {
+            PasswordHash = passwordHash;
+        }
     }
 }

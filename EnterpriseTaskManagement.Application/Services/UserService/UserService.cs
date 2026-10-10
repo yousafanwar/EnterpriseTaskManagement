@@ -325,5 +325,46 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
 
             await _refreshTokenRepository.UpdateAsync(storedToken);
         }
+
+        public async Task ResetPasswordAsync(int userId, ResetPasswordRequest request)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+            var passwordValid = BCrypt.Net.BCrypt.Verify(
+                request.CurrentPassword,
+                user.PasswordHash
+            );
+
+            if (!passwordValid)
+            {
+                throw new UnauthorizedAccessException("Current password is incorrect.");
+            }
+
+            if (request.CurrentPassword == request.NewPassword)
+            {
+                throw new ArgumentException("New password must be different from the current password.");
+            }
+
+            user.SetPasswordHash(BCrypt.Net.BCrypt.HashPassword(request.NewPassword));
+            await _userRepository.UpdateAsync(user);
+        }
+
+        public async Task AdminResetPasswordAsync(int userId, AdminResetPasswordRequest request)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+            user.SetPasswordHash(BCrypt.Net.BCrypt.HashPassword(request.NewPassword));
+            await _userRepository.UpdateAsync(user);
+        }
     }
 }

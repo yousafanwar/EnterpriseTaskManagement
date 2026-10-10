@@ -21,5 +21,7 @@ namespace EnterpriseTaskManagement.Application.Services.UserService
         Task<LoginResult> LoginAsync(LoginRequest request);
         Task<LoginResult> RefreshTokenAsync(string request);
         Task LogoutAsync(string refreshToken);
+        Task ResetPasswordAsync(int userId, ResetPasswordRequest request);
+        Task AdminResetPasswordAsync(int userId, AdminResetPasswordRequest request);
     }
 }

@@ -232,5 +232,47 @@ namespace EnterpriseTaskManagement.API.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("reset-password")]
+        [Authorize]
+        public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
+        {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(currentUserId, out var userId))
+                return Unauthorized();
+
+            try
+            {
+                await _userService.ResetPasswordAsync(userId, request);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("{id:int}/reset-password")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminResetPassword(int id, AdminResetPasswordRequest request)
+        {
+            try
+            {
+                await _userService.AdminResetPasswordAsync(id, request);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+        }
     }
 }
