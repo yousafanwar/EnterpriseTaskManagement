@@ -20,9 +20,13 @@ services:
       Jwt__Issuer: "EnterpriseTaskManagement"
       Jwt__Audience: "EnterpriseTaskManagementClient"
       Jwt__ExpirationMinutes: "60"
+      AI_ENABLED: ${AI_ENABLED:-false}
       AI_PROVIDER: ${AI_PROVIDER:-Gemini}
       AI_API_KEY: ${AI_API_KEY}
       AI_MODEL: ${AI_MODEL}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
     depends_on:
       - sqlserver
 

@@ -21,6 +21,7 @@ namespace EnterpriseTaskManagement.Persistence
         public DbSet<ProjectUser> ProjectUsers { get; set; }
         public DbSet<ProjectSkill> ProjectSkills { get; set; }
         public DbSet<UserSkill> UserSkills { get; set; }
+        public DbSet<TaskSkill> TaskSkills { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -123,6 +124,21 @@ namespace EnterpriseTaskManagement.Persistence
                 .HasOne(task => task.Project)
                 .WithMany(project => project.Tasks)
                 .HasForeignKey(task => task.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TaskSkill>()
+                .HasKey(ts => new { ts.TaskId, ts.SkillId });
+
+            modelBuilder.Entity<TaskSkill>()
+                .HasOne(ts => ts.Task)
+                .WithMany(t => t.RequiredSkills)
+                .HasForeignKey(ts => ts.TaskId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TaskSkill>()
+                .HasOne(ts => ts.Skill)
+                .WithMany()
+                .HasForeignKey(ts => ts.SkillId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

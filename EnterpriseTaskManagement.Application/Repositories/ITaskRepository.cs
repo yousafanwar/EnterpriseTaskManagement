@@ -10,6 +10,10 @@ namespace EnterpriseTaskManagement.Application.Repositories
     {
         Task <TaskItem?> GetByIdAsync(int Id);
         Task AddTask(TaskItem task);
+        Task AddTaskWithRequiredSkillsAsync(
+            TaskItem task,
+            IEnumerable<int> requiredSkillIds,
+            CancellationToken cancellationToken = default);
         Task <(IEnumerable<TaskItem> Tasks, int TotalCount)> GetAllAsync(TaskQueryRequest request);
         Task UpdateAsync(TaskItem task);
         Task ReloadAssigneeAsync(TaskItem task);

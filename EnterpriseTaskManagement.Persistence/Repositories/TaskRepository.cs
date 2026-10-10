@@ -1,4 +1,3 @@
-using Azure;
 using EnterpriseTaskManagement.Application.DTOs;
 using EnterpriseTaskManagement.Application.Repositories;
 using EnterpriseTaskManagement.Domain.Entities;
@@ -21,6 +20,7 @@ public class TaskRepository : ITaskRepository
         return await _dbContext.Tasks
             .Include(task => task.Assignee)
             .Include(task => task.Project)
+            .Include(task => task.RequiredSkills)
             .FirstOrDefaultAsync(task => task.Id == id);
     }
 
@@ -30,13 +30,35 @@ public class TaskRepository : ITaskRepository
         await _dbContext.SaveChangesAsync();
     }
 
+    public async Task AddTaskWithRequiredSkillsAsync(
+        TaskItem task,
+        IEnumerable<int> requiredSkillIds,
+        CancellationToken cancellationToken = default)
+    {
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(
+            cancellationToken);
+
+        await _dbContext.Tasks.AddAsync(task, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        foreach (var skillId in requiredSkillIds.Distinct())
+        {
+            await _dbContext.TaskSkills.AddAsync(
+                new TaskSkill(task.Id, skillId),
+                cancellationToken);
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+    }
+
     public async Task<(IEnumerable<TaskItem> Tasks, int TotalCount)> GetAllAsync(TaskQueryRequest request)
     {
-        //return await _dbContext.Tasks.ToListAsync();
 
         var query = _dbContext.Tasks
             .Include(task => task.Assignee)
             .Include(task => task.Project)
+            .Include(task => task.RequiredSkills)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(request.Search))

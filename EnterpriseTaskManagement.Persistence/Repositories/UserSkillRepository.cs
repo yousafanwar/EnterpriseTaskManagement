@@ -30,6 +30,29 @@ namespace EnterpriseTaskManagement.Persistence.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IReadOnlyDictionary<int, HashSet<int>>> GetSkillIdsByUserIdsAsync(
+            IEnumerable<int> userIds,
+            CancellationToken cancellationToken = default)
+        {
+            var idList = userIds.Distinct().ToList();
+            if (idList.Count == 0)
+            {
+                return new Dictionary<int, HashSet<int>>();
+            }
+
+            var rows = await _context.UserSkills
+                .Where(us => idList.Contains(us.UserId))
+                .AsNoTracking()
+                .Select(us => new { us.UserId, us.SkillId })
+                .ToListAsync(cancellationToken);
+
+            return rows
+                .GroupBy(r => r.UserId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(x => x.SkillId).ToHashSet());
+        }
+
         public async Task AddAsync(UserSkill userSkill)
         {
             await _context.UserSkills.AddAsync(userSkill);
