@@ -3,11 +3,16 @@ using EnterpriseTaskManagement.Application.Interfaces.Repositories;
 using EnterpriseTaskManagement.Application.Interfaces.Services;
 using EnterpriseTaskManagement.Application.Repositories;
 using EnterpriseTaskManagement.Application.Services;
+using EnterpriseTaskManagement.Application.Services.AIProviderService;
 using EnterpriseTaskManagement.Application.Services.AuthService;
 using EnterpriseTaskManagement.Application.Services.CommentService;
+using EnterpriseTaskManagement.Application.Services.ImageStorage;
 using EnterpriseTaskManagement.Application.Services.Interfaces;
 using EnterpriseTaskManagement.Application.Services.RoleService;
+using EnterpriseTaskManagement.Application.Services.TaskAnalysisService;
 using EnterpriseTaskManagement.Application.Services.UserService;
+using EnterpriseTaskManagement.Infrastructure.AI;
+using EnterpriseTaskManagement.Infrastructure.ImageStorage;
 using EnterpriseTaskManagement.Persistence;
 using EnterpriseTaskManagement.Persistence.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,8 +20,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
-using EnterpriseTaskManagement.Application.Services.TaskAnalysisService;
-using EnterpriseTaskManagement.Infrastructure.DependencyInjection;
 using DotNetEnv;
 
 if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
@@ -26,11 +29,11 @@ if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
 
 var builder = WebApplication.CreateBuilder(args);
 
+var aiEnabled = IsFeatureFlagEnabled(builder.Configuration["AI_ENABLED"]);
+
 if (builder.Environment.IsDevelopment())
 {
-    Console.WriteLine(
-        $"AI provider configured: {!string.IsNullOrWhiteSpace(builder.Configuration["AI_PROVIDER"])}"
-    );
+    Console.WriteLine($"AI features enabled: {aiEnabled}");
 }
 
 // Add services to the container.
@@ -99,9 +102,9 @@ builder.Services.AddCors(options =>
               .AllowCredentials());
 });
 
-
 var aiSettings = new AISettings
 {
+    Enabled = aiEnabled,
     Provider = builder.Configuration["AI_PROVIDER"] ?? "Gemini",
     ApiKey = builder.Configuration["AI_API_KEY"] ?? string.Empty,
     Model = builder.Configuration["AI_MODEL"] ?? string.Empty,
@@ -111,27 +114,86 @@ var aiSettings = new AISettings
         "agent.md")
 };
 
-ServiceCollectionExtensions.ValidateAiSettings(aiSettings);
-
-builder.Services.Configure<CloudinarySettings>(options =>
-{
-    options.CloudName = builder.Configuration["CLOUDINARY_CLOUD_NAME"] ?? string.Empty;
-    options.ApiKey = builder.Configuration["CLOUDINARY_API_KEY"] ?? string.Empty;
-    options.ApiSecret = builder.Configuration["CLOUDINARY_API_SECRET"] ?? string.Empty;
-});
-
+builder.Services.AddSingleton(aiSettings);
 builder.Services.Configure<ImageUploadSettings>(_ => { });
 
-ServiceCollectionExtensions.ValidateCloudinarySettings(
-    new CloudinarySettings
+if (aiSettings.Enabled)
+{
+    if (string.IsNullOrWhiteSpace(aiSettings.ApiKey))
+    {
+        throw new InvalidOperationException(
+            "AI_API_KEY is required when AI_ENABLED=true.");
+    }
+
+    if (string.IsNullOrWhiteSpace(aiSettings.Model))
+    {
+        throw new InvalidOperationException(
+            "AI_MODEL is required when AI_ENABLED=true.");
+    }
+
+    if (string.IsNullOrWhiteSpace(aiSettings.AgentPromptPath)
+        || !File.Exists(aiSettings.AgentPromptPath))
+    {
+        throw new InvalidOperationException(
+            "AI agent prompt file (agent.md) was not found at the configured path.");
+    }
+
+    var cloudinarySettings = new CloudinarySettings
     {
         CloudName = builder.Configuration["CLOUDINARY_CLOUD_NAME"] ?? string.Empty,
         ApiKey = builder.Configuration["CLOUDINARY_API_KEY"] ?? string.Empty,
         ApiSecret = builder.Configuration["CLOUDINARY_API_SECRET"] ?? string.Empty
+    };
+
+    if (string.IsNullOrWhiteSpace(cloudinarySettings.CloudName)
+        || string.IsNullOrWhiteSpace(cloudinarySettings.ApiKey)
+        || string.IsNullOrWhiteSpace(cloudinarySettings.ApiSecret))
+    {
+        throw new InvalidOperationException(
+            "Cloudinary credentials (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) are required when AI_ENABLED=true.");
+    }
+
+    builder.Services.Configure<CloudinarySettings>(options =>
+    {
+        options.CloudName = cloudinarySettings.CloudName;
+        options.ApiKey = cloudinarySettings.ApiKey;
+        options.ApiSecret = cloudinarySettings.ApiSecret;
     });
 
-builder.Services.AddInfrastructureServices(aiSettings);
-builder.Services.AddScoped<ITaskAnalysisService, EnterpriseTaskManagement.Application.Services.TaskAnalysisService.TaskAnalysisService>();
+    builder.Services.AddHttpClient<GeminiAiProvider>(client =>
+    {
+        client.Timeout = TimeSpan.FromMinutes(5);
+    });
+
+    builder.Services.AddHttpClient<OpenAiAiProvider>(client =>
+    {
+        client.Timeout = TimeSpan.FromMinutes(5);
+    });
+
+    var provider = aiSettings.Provider.Trim();
+    if (provider.Equals("Gemini", StringComparison.OrdinalIgnoreCase))
+    {
+        builder.Services.AddScoped<IAIProvider>(sp => sp.GetRequiredService<GeminiAiProvider>());
+    }
+    else if (provider.Equals("OpenAI", StringComparison.OrdinalIgnoreCase))
+    {
+        builder.Services.AddScoped<IAIProvider>(sp => sp.GetRequiredService<OpenAiAiProvider>());
+    }
+    else
+    {
+        throw new InvalidOperationException(
+            $"Unsupported AI provider '{aiSettings.Provider}'. Supported values: Gemini, OpenAI.");
+    }
+
+    builder.Services.AddScoped<IImageStorageService, CloudinaryImageStorageService>();
+}
+else
+{
+    builder.Services.AddScoped<IAIProvider, DisabledAiProvider>();
+    builder.Services.AddScoped<IImageStorageService, DisabledImageStorageService>();
+}
+
+builder.Services.AddScoped<ITaskAnalysisService, TaskAnalysisService>();
 builder.Services.AddScoped<IAiTaskWorkflowService, AiTaskWorkflowService>();
 
 var app = builder.Build();
@@ -159,3 +221,15 @@ app.MapControllers();
 app.UseCors("Frontend");
 
 app.Run();
+
+static bool IsFeatureFlagEnabled(string? value)
+{
+    if (string.IsNullOrWhiteSpace(value))
+    {
+        return false;
+    }
+
+    return value.Equals("true", StringComparison.OrdinalIgnoreCase)
+        || value.Equals("1", StringComparison.OrdinalIgnoreCase)
+        || value.Equals("yes", StringComparison.OrdinalIgnoreCase);
+}

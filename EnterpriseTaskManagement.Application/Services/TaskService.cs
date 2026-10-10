@@ -65,9 +65,10 @@ namespace EnterpriseTaskManagement.Application.Services
                     },
                 OriginalFeedback = task.OriginalFeedback,
                 FeedbackImageUrl = task.FeedbackImageUrl,
-                RequiredSkillIds = task.RequiredSkills
+                RequiredSkillIds = task.RequiredSkills?
                     .Select(ts => ts.SkillId)
                     .ToList()
+                    ?? []
             };
         }
 

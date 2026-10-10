@@ -54,11 +54,11 @@ public class TaskRepository : ITaskRepository
 
     public async Task<(IEnumerable<TaskItem> Tasks, int TotalCount)> GetAllAsync(TaskQueryRequest request)
     {
-        //return await _dbContext.Tasks.ToListAsync();
 
         var query = _dbContext.Tasks
             .Include(task => task.Assignee)
             .Include(task => task.Project)
+            .Include(task => task.RequiredSkills)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(request.Search))

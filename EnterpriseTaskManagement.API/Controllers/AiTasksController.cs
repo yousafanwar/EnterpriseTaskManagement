@@ -1,4 +1,5 @@
 using EnterpriseTaskManagement.API.Contracts.AI;
+using EnterpriseTaskManagement.Application.Configuration;
 using EnterpriseTaskManagement.Application.DTOs.AI;
 using EnterpriseTaskManagement.Application.Services.TaskAnalysisService;
 using Microsoft.AspNetCore.Authorization;
@@ -13,10 +14,14 @@ namespace EnterpriseTaskManagement.API.Controllers;
 public class AiTasksController : ControllerBase
 {
     private readonly IAiTaskWorkflowService _workflowService;
+    private readonly AISettings _aiSettings;
 
-    public AiTasksController(IAiTaskWorkflowService workflowService)
+    public AiTasksController(
+        IAiTaskWorkflowService workflowService,
+        AISettings aiSettings)
     {
         _workflowService = workflowService;
+        _aiSettings = aiSettings;
     }
 
     [HttpPost("analyze")]
@@ -26,6 +31,14 @@ public class AiTasksController : ControllerBase
         [FromForm] AnalyzeTaskFormRequest request,
         CancellationToken cancellationToken)
     {
+        if (!_aiSettings.Enabled)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status503ServiceUnavailable,
+                title: "AI features disabled.",
+                detail: "AI task analysis is disabled. Set AI_ENABLED=true and configure AI credentials to use this feature.");
+        }
+
         if (!ModelState.IsValid)
         {
             return ValidationProblem(ModelState);
