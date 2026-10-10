@@ -1,3 +1,4 @@
+using EnterpriseTaskManagement.API.Configuration;
 using EnterpriseTaskManagement.Application.Interfaces.Repositories;
 using EnterpriseTaskManagement.Application.Interfaces.Services;
 using EnterpriseTaskManagement.Application.Repositories;
@@ -14,9 +15,22 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
+using EnterpriseTaskManagement.API.Configuration;
+using DotNetEnv;
+
+if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
+{
+    Env.TraversePath().Load();
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
+if (builder.Environment.IsDevelopment())
+{
+    Console.WriteLine(
+        $"AI provider configured: {!string.IsNullOrWhiteSpace(builder.Configuration["AI_PROVIDER"])}"
+    );
+}
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
@@ -82,6 +96,16 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials());
+});
+
+
+builder.Services.Configure<AISettings>(options =>
+{
+    options.Provider = builder.Configuration["AI_PROVIDER"] ?? "Gemini";
+
+    options.ApiKey = builder.Configuration["AI_API_KEY"] ?? string.Empty;
+
+    options.Model = builder.Configuration["AI_MODEL"] ?? string.Empty;
 });
 
 var app = builder.Build();

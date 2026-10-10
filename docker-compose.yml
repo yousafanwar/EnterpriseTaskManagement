@@ -20,6 +20,9 @@ services:
       Jwt__Issuer: "EnterpriseTaskManagement"
       Jwt__Audience: "EnterpriseTaskManagementClient"
       Jwt__ExpirationMinutes: "60"
+      AI_PROVIDER: ${AI_PROVIDER:-Gemini}
+      AI_API_KEY: ${AI_API_KEY}
+      AI_MODEL: ${AI_MODEL}
     depends_on:
       - sqlserver
 
