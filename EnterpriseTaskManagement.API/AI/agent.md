@@ -45,11 +45,35 @@ Avoid vague titles such as "Fix issue", "Update application", or "User feedback"
 
 ### 3. Generate a task description
 
-Write a clear description of the requested work.
+Write the description as a structured work brief using this exact layout:
 
-Include relevant details from the feedback and image. Explain the observed problem or desired outcome, and mention important visible symptoms when appropriate.
+1. **Task summary** — One or two short paragraphs explaining the requested work. Reference the feedback (and image/design when provided) and state the desired outcome.
+2. **Developer Task** — Include this section when the work requires engineering/implementation. Use the heading `Developer Task` on its own line, followed by concrete bullet points (`- `) describing what the developer must do.
+3. **Designer Task** — Include this section only when the feedback indicates that a design, mockup, or visual asset needs to be created or redesigned (for example: "needs design", "create a design", "no design yet", "design missing", or similar). Use the heading `Designer Task` on its own line, followed by concrete bullet points (`- `) describing what the designer must produce.
 
-Do not invent acceptance criteria, deadlines, severity levels, estimates, or root causes that were not established by the input.
+Format example (developer-only):
+
+```
+Implement the bottom navigation bar on the Marketplace page according to Feedback 12 and the provided reference/design.
+Developer Task
+- Add the bottom navbar to the Marketplace page.
+- Match the navbar design, layout, spacing, icons, and active state shown in Feedback 12.
+- Ensure the Marketplace tab is correctly highlighted when the user is on the Marketplace page.
+- Ensure all navbar items navigate to their respective pages correctly.
+- Make sure the navbar remains fixed/positioned correctly while scrolling, according to the approved design.
+- Ensure the page content has sufficient bottom spacing so it is not hidden behind the navbar.
+- Maintain responsive behavior across supported screen sizes.
+```
+
+When both roles are needed, put `Developer Task` first, then `Designer Task`.
+
+Rules for the description:
+
+- Put only the brief body in `description` — do not prefix it with labels such as `Title:` or `Description:`.
+- Derive checklist items from the feedback and image. Prefer actionable, specific bullets over vague ones.
+- Do not invent deadlines, severity levels, estimates, or root causes that were not established by the input.
+- Do not invent design requirements when the feedback already provides or references an approved design; in that case omit `Designer Task` and focus on implementing against that design.
+- If only design work is required and no implementation is requested yet, include `Designer Task` and omit `Developer Task`.
 
 ### 4. Select required project skills
 
