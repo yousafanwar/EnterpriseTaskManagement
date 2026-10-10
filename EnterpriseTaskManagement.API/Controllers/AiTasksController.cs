@@ -25,7 +25,7 @@ public class AiTasksController : ControllerBase
     }
 
     [HttpPost("analyze")]
-    [RequestSizeLimit(6 * 1024 * 1024)]
+    [RequestSizeLimit(15 * 1024 * 1024)]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult> AnalyzeAndCreateTask(
         [FromForm] AnalyzeTaskFormRequest request,
