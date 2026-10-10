@@ -11,5 +11,11 @@ namespace EnterpriseTaskManagement.Application.DTOs
         public int ProjectId { get; set; }
         public string ProjectName { get; set; } = string.Empty;
         public AssigneeDto? Assignee { get; set; }
+
+        public string OriginalFeedback { get; set; } = string.Empty;
+
+        public string? FeedbackImageUrl { get; set; }
+
+        public IReadOnlyList<int> RequiredSkillIds { get; set; } = Array.Empty<int>();
     }
 }

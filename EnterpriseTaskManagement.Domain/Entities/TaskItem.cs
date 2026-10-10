@@ -15,6 +15,14 @@ namespace EnterpriseTaskManagement.Domain.Entities
         public int ProjectId { get; private set; }
         public Project Project { get; private set; } = null!;
 
+        public string OriginalFeedback { get; private set; } = string.Empty;
+
+        public string? FeedbackImageUrl { get; private set; }
+
+        public string? FeedbackImagePublicId { get; private set; }
+
+        public ICollection<TaskSkill> RequiredSkills { get; private set; } = new List<TaskSkill>();
+
         private TaskItem () 
         { 
         }
@@ -25,6 +33,23 @@ namespace EnterpriseTaskManagement.Domain.Entities
             Description = description;
             Status = TaskItemStatus.Pending;
             ProjectId = projectId;
+        }
+
+        public TaskItem(
+            string title,
+            string description,
+            int projectId,
+            string originalFeedback,
+            string? feedbackImageUrl,
+            string? feedbackImagePublicId)
+        {
+            Title = title;
+            Description = description;
+            Status = TaskItemStatus.Pending;
+            ProjectId = projectId;
+            OriginalFeedback = originalFeedback;
+            FeedbackImageUrl = feedbackImageUrl;
+            FeedbackImagePublicId = feedbackImagePublicId;
         }
 
         public void AssignTo(int userId)

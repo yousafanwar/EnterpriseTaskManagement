@@ -1,4 +1,4 @@
-using EnterpriseTaskManagement.API.Configuration;
+using EnterpriseTaskManagement.Application.Configuration;
 using EnterpriseTaskManagement.Application.Interfaces.Repositories;
 using EnterpriseTaskManagement.Application.Interfaces.Services;
 using EnterpriseTaskManagement.Application.Repositories;
@@ -15,7 +15,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
-using EnterpriseTaskManagement.API.Configuration;
+using EnterpriseTaskManagement.Application.Services.TaskAnalysisService;
+using EnterpriseTaskManagement.Infrastructure.DependencyInjection;
 using DotNetEnv;
 
 if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
@@ -99,14 +100,39 @@ builder.Services.AddCors(options =>
 });
 
 
-builder.Services.Configure<AISettings>(options =>
+var aiSettings = new AISettings
 {
-    options.Provider = builder.Configuration["AI_PROVIDER"] ?? "Gemini";
+    Provider = builder.Configuration["AI_PROVIDER"] ?? "Gemini",
+    ApiKey = builder.Configuration["AI_API_KEY"] ?? string.Empty,
+    Model = builder.Configuration["AI_MODEL"] ?? string.Empty,
+    AgentPromptPath = Path.Combine(
+        AppContext.BaseDirectory,
+        "AI",
+        "agent.md")
+};
 
-    options.ApiKey = builder.Configuration["AI_API_KEY"] ?? string.Empty;
+ServiceCollectionExtensions.ValidateAiSettings(aiSettings);
 
-    options.Model = builder.Configuration["AI_MODEL"] ?? string.Empty;
+builder.Services.Configure<CloudinarySettings>(options =>
+{
+    options.CloudName = builder.Configuration["CLOUDINARY_CLOUD_NAME"] ?? string.Empty;
+    options.ApiKey = builder.Configuration["CLOUDINARY_API_KEY"] ?? string.Empty;
+    options.ApiSecret = builder.Configuration["CLOUDINARY_API_SECRET"] ?? string.Empty;
 });
+
+builder.Services.Configure<ImageUploadSettings>(_ => { });
+
+ServiceCollectionExtensions.ValidateCloudinarySettings(
+    new CloudinarySettings
+    {
+        CloudName = builder.Configuration["CLOUDINARY_CLOUD_NAME"] ?? string.Empty,
+        ApiKey = builder.Configuration["CLOUDINARY_API_KEY"] ?? string.Empty,
+        ApiSecret = builder.Configuration["CLOUDINARY_API_SECRET"] ?? string.Empty
+    });
+
+builder.Services.AddInfrastructureServices(aiSettings);
+builder.Services.AddScoped<ITaskAnalysisService, EnterpriseTaskManagement.Application.Services.TaskAnalysisService.TaskAnalysisService>();
+builder.Services.AddScoped<IAiTaskWorkflowService, AiTaskWorkflowService>();
 
 var app = builder.Build();
 

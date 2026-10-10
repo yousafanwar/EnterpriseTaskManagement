@@ -62,7 +62,12 @@ namespace EnterpriseTaskManagement.Application.Services
                         FirstName = task.Assignee.FirstName,
                         LastName = task.Assignee.LastName,
                         Email = task.Assignee.Email
-                    }
+                    },
+                OriginalFeedback = task.OriginalFeedback,
+                FeedbackImageUrl = task.FeedbackImageUrl,
+                RequiredSkillIds = task.RequiredSkills
+                    .Select(ts => ts.SkillId)
+                    .ToList()
             };
         }
 

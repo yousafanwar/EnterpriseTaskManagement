@@ -228,6 +228,16 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("FeedbackImagePublicId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FeedbackImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OriginalFeedback")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
@@ -245,6 +255,21 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Tasks");
+                });
+
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.TaskSkill", b =>
+                {
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SkillId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TaskId", "SkillId");
+
+                    b.HasIndex("SkillId");
+
+                    b.ToTable("TaskSkills");
                 });
 
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.User", b =>
@@ -399,6 +424,25 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.TaskSkill", b =>
+                {
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.Skill", "Skill")
+                        .WithMany()
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.TaskItem", "Task")
+                        .WithMany("RequiredSkills")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Skill");
+
+                    b.Navigation("Task");
+                });
+
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.User", b =>
                 {
                     b.HasOne("EnterpriseTaskManagement.Domain.Entities.Role", "Role")
@@ -446,6 +490,8 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("History");
+
+                    b.Navigation("RequiredSkills");
                 });
 
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.User", b =>

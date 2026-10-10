@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EnterpriseTaskManagement.Infrastructure\EnterpriseTaskManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\EnterpriseTaskManagement.Persistence\EnterpriseTaskManagement.Persistence.csproj" />
   </ItemGroup>
 
