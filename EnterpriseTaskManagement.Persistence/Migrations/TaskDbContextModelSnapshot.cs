@@ -52,6 +52,33 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.ProcessedWhatsAppMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("MessageId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("ProcessedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("TaskId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MessageId")
+                        .IsUnique();
+
+                    b.ToTable("ProcessedWhatsAppMessages");
+                });
+
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.Project", b =>
                 {
                     b.Property<int>("Id")
@@ -321,6 +348,42 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.ToTable("UserSkills");
                 });
 
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.WhatsAppContact", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Label")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("PhoneNumberId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PhoneNumberId")
+                        .IsUnique();
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("WhatsAppContacts");
+                });
+
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.Comment", b =>
                 {
                     b.HasOne("EnterpriseTaskManagement.Domain.Entities.TaskItem", "Task")
@@ -471,6 +534,17 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.Navigation("Skill");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.WhatsAppContact", b =>
+                {
+                    b.HasOne("EnterpriseTaskManagement.Domain.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.Project", b =>
