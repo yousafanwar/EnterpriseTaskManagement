@@ -72,6 +72,42 @@ public class WhatsAppInboundMessage
 
     [JsonPropertyName("image")]
     public WhatsAppImageBody? Image { get; set; }
+
+    [JsonPropertyName("interactive")]
+    public WhatsAppInteractiveBody? Interactive { get; set; }
+}
+
+public class WhatsAppInteractiveBody
+{
+    [JsonPropertyName("type")]
+    public string? Type { get; set; }
+
+    [JsonPropertyName("list_reply")]
+    public WhatsAppListReply? ListReply { get; set; }
+
+    [JsonPropertyName("button_reply")]
+    public WhatsAppButtonReply? ButtonReply { get; set; }
+}
+
+public class WhatsAppListReply
+{
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
+    [JsonPropertyName("title")]
+    public string? Title { get; set; }
+
+    [JsonPropertyName("description")]
+    public string? Description { get; set; }
+}
+
+public class WhatsAppButtonReply
+{
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
+    [JsonPropertyName("title")]
+    public string? Title { get; set; }
 }
 
 public class WhatsAppTextBody

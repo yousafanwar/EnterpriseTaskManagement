@@ -71,6 +71,7 @@ builder.Services.AddScoped<ISkillRepository, SkillRepository>();
 builder.Services.AddScoped<ISkillService, SkillService>();
 builder.Services.AddScoped<IWhatsAppContactRepository, WhatsAppContactRepository>();
 builder.Services.AddScoped<IProcessedWhatsAppMessageRepository, ProcessedWhatsAppMessageRepository>();
+builder.Services.AddScoped<IWhatsAppConversationSessionRepository, WhatsAppConversationSessionRepository>();
 builder.Services.AddScoped<IWhatsAppContactService, WhatsAppContactService>();
 builder.Services.AddScoped<IWhatsAppInboundHandler, WhatsAppInboundHandler>();
 builder.Services.AddScoped<IWhatsAppBotUserSeeder, WhatsAppBotUserSeeder>();

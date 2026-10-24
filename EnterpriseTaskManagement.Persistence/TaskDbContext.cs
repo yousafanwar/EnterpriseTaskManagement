@@ -24,6 +24,7 @@ namespace EnterpriseTaskManagement.Persistence
         public DbSet<TaskSkill> TaskSkills { get; set; }
         public DbSet<WhatsAppContact> WhatsAppContacts { get; set; }
         public DbSet<ProcessedWhatsAppMessage> ProcessedWhatsAppMessages { get; set; }
+        public DbSet<WhatsAppConversationSession> WhatsAppConversationSessions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -169,6 +170,25 @@ namespace EnterpriseTaskManagement.Persistence
             modelBuilder.Entity<ProcessedWhatsAppMessage>()
                 .Property(m => m.MessageId)
                 .HasMaxLength(128)
+                .IsRequired();
+
+            modelBuilder.Entity<WhatsAppConversationSession>()
+                .HasIndex(s => new { s.BusinessPhoneNumberId, s.SenderWaId })
+                .IsUnique();
+
+            modelBuilder.Entity<WhatsAppConversationSession>()
+                .Property(s => s.BusinessPhoneNumberId)
+                .HasMaxLength(64)
+                .IsRequired();
+
+            modelBuilder.Entity<WhatsAppConversationSession>()
+                .Property(s => s.SenderWaId)
+                .HasMaxLength(32)
+                .IsRequired();
+
+            modelBuilder.Entity<WhatsAppConversationSession>()
+                .Property(s => s.SelectedProjectName)
+                .HasMaxLength(200)
                 .IsRequired();
         }
     }

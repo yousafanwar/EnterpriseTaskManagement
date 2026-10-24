@@ -1,7 +1,8 @@
 namespace EnterpriseTaskManagement.Domain.Entities;
 
 /// <summary>
-/// Maps a WhatsApp Business phone number (one chat/line per project) to a fixed project.
+/// Enables a WhatsApp Business phone number for inbound task creation.
+/// Project selection happens in the chat flow; <see cref="ProjectId"/> is retained for admin labeling only.
 /// </summary>
 public class WhatsAppContact
 {
@@ -12,6 +13,9 @@ public class WhatsAppContact
     /// </summary>
     public string PhoneNumberId { get; private set; } = null!;
 
+    /// <summary>
+    /// Optional admin reference project; not used to route inbound messages.
+    /// </summary>
     public int ProjectId { get; private set; }
 
     public Project Project { get; private set; } = null!;

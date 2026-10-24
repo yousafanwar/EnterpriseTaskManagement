@@ -21,4 +21,18 @@ public class DisabledWhatsAppCloudApiClient : IWhatsAppCloudApiClient
         throw new InvalidOperationException(
             "WhatsApp integration is disabled. Set WHATSAPP_ENABLED=true and configure credentials.");
     }
+
+    public Task SendListMessageAsync(
+        string businessPhoneNumberId,
+        string recipientWaId,
+        string bodyText,
+        string buttonText,
+        IReadOnlyList<WhatsAppListSection> sections,
+        string? headerText = null,
+        string? footerText = null,
+        CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException(
+            "WhatsApp integration is disabled. Set WHATSAPP_ENABLED=true and configure credentials.");
+    }
 }

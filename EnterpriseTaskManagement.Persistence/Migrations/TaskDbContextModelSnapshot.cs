@@ -384,6 +384,49 @@ namespace EnterpriseTaskManagement.Persistence.Migrations
                     b.ToTable("WhatsAppContacts");
                 });
 
+            modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.WhatsAppConversationSession", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BusinessPhoneNumberId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime>("ExpiresAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SelectedProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SelectedProjectName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("SenderWaId")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<int>("Step")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessPhoneNumberId", "SenderWaId")
+                        .IsUnique();
+
+                    b.ToTable("WhatsAppConversationSessions");
+                });
+
             modelBuilder.Entity("EnterpriseTaskManagement.Domain.Entities.Comment", b =>
                 {
                     b.HasOne("EnterpriseTaskManagement.Domain.Entities.TaskItem", "Task")

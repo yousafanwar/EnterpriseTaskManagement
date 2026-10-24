@@ -119,6 +119,90 @@ public class WhatsAppCloudApiClient : IWhatsAppCloudApiClient
             text = new { preview_url = false, body }
         };
 
+        await SendMessagePayloadAsync(businessPhoneNumberId, payload, cancellationToken);
+    }
+
+    public async Task SendListMessageAsync(
+        string businessPhoneNumberId,
+        string recipientWaId,
+        string bodyText,
+        string buttonText,
+        IReadOnlyList<WhatsAppListSection> sections,
+        string? headerText = null,
+        string? footerText = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(businessPhoneNumberId))
+        {
+            throw new ArgumentException("Business phone number id is required.", nameof(businessPhoneNumberId));
+        }
+
+        if (string.IsNullOrWhiteSpace(recipientWaId))
+        {
+            throw new ArgumentException("Recipient WhatsApp id is required.", nameof(recipientWaId));
+        }
+
+        if (sections is null || sections.Count == 0)
+        {
+            throw new ArgumentException("At least one list section is required.", nameof(sections));
+        }
+
+        var interactive = new Dictionary<string, object?>
+        {
+            ["type"] = "list",
+            ["body"] = new { text = bodyText },
+            ["action"] = new
+            {
+                button = Truncate(buttonText, 20),
+                sections = sections.Select(section => new
+                {
+                    title = Truncate(section.Title, 24),
+                    rows = section.Rows.Select(row =>
+                    {
+                        var rowPayload = new Dictionary<string, object?>
+                        {
+                            ["id"] = Truncate(row.Id, 200),
+                            ["title"] = Truncate(row.Title, 24)
+                        };
+
+                        if (!string.IsNullOrWhiteSpace(row.Description))
+                        {
+                            rowPayload["description"] = Truncate(row.Description, 72);
+                        }
+
+                        return rowPayload;
+                    }).ToList()
+                }).ToList()
+            }
+        };
+
+        if (!string.IsNullOrWhiteSpace(headerText))
+        {
+            interactive["header"] = new { type = "text", text = Truncate(headerText, 60) };
+        }
+
+        if (!string.IsNullOrWhiteSpace(footerText))
+        {
+            interactive["footer"] = new { text = Truncate(footerText, 60) };
+        }
+
+        var payload = new
+        {
+            messaging_product = "whatsapp",
+            recipient_type = "individual",
+            to = recipientWaId,
+            type = "interactive",
+            interactive
+        };
+
+        await SendMessagePayloadAsync(businessPhoneNumberId, payload, cancellationToken);
+    }
+
+    private async Task SendMessagePayloadAsync(
+        string businessPhoneNumberId,
+        object payload,
+        CancellationToken cancellationToken)
+    {
         using var request = CreateAuthorizedRequest(
             HttpMethod.Post,
             $"{_settings.GraphApiBaseUrl.TrimEnd('/')}/{businessPhoneNumberId}/messages");
@@ -134,6 +218,12 @@ public class WhatsAppCloudApiClient : IWhatsAppCloudApiClient
                 errorBody);
             throw new InvalidOperationException("Failed to send WhatsApp message.");
         }
+    }
+
+    private static string Truncate(string value, int maxLength)
+    {
+        var trimmed = value.Trim();
+        return trimmed.Length <= maxLength ? trimmed : trimmed[..maxLength];
     }
 
     private HttpRequestMessage CreateAuthorizedRequest(HttpMethod method, string url)

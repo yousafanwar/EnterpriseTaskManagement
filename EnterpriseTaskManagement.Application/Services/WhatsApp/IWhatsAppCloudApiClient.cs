@@ -11,6 +11,16 @@ public interface IWhatsAppCloudApiClient
         string recipientWaId,
         string body,
         CancellationToken cancellationToken = default);
+
+    Task SendListMessageAsync(
+        string businessPhoneNumberId,
+        string recipientWaId,
+        string bodyText,
+        string buttonText,
+        IReadOnlyList<WhatsAppListSection> sections,
+        string? headerText = null,
+        string? footerText = null,
+        CancellationToken cancellationToken = default);
 }
 
 public class WhatsAppMediaDownloadResult
