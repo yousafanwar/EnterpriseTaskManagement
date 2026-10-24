@@ -230,7 +230,6 @@ public class WhatsAppInboundHandler : IWhatsAppInboundHandler
                 message.From,
                 "Sorry, something went wrong. Reply menu to start again.",
                 cancellationToken);
-            await MarkProcessedAsync(message.Id, taskId: null, cancellationToken);
         }
     }
 
@@ -463,7 +462,6 @@ public class WhatsAppInboundHandler : IWhatsAppInboundHandler
                 message.From!,
                 "Sorry, we could not create a task from that message. Please try again, or reply *menu* to restart.",
                 cancellationToken);
-            await MarkProcessedAsync(message.Id!, taskId: null, cancellationToken);
         }
         finally
         {
