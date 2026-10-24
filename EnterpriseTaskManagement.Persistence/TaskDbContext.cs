@@ -22,6 +22,9 @@ namespace EnterpriseTaskManagement.Persistence
         public DbSet<ProjectSkill> ProjectSkills { get; set; }
         public DbSet<UserSkill> UserSkills { get; set; }
         public DbSet<TaskSkill> TaskSkills { get; set; }
+        public DbSet<WhatsAppContact> WhatsAppContacts { get; set; }
+        public DbSet<ProcessedWhatsAppMessage> ProcessedWhatsAppMessages { get; set; }
+        public DbSet<WhatsAppConversationSession> WhatsAppConversationSessions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -140,6 +143,53 @@ namespace EnterpriseTaskManagement.Persistence
                 .WithMany()
                 .HasForeignKey(ts => ts.SkillId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WhatsAppContact>()
+                .HasIndex(c => c.PhoneNumberId)
+                .IsUnique();
+
+            modelBuilder.Entity<WhatsAppContact>()
+                .Property(c => c.PhoneNumberId)
+                .HasMaxLength(64)
+                .IsRequired();
+
+            modelBuilder.Entity<WhatsAppContact>()
+                .Property(c => c.Label)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<WhatsAppContact>()
+                .HasOne(c => c.Project)
+                .WithMany()
+                .HasForeignKey(c => c.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ProcessedWhatsAppMessage>()
+                .HasIndex(m => m.MessageId)
+                .IsUnique();
+
+            modelBuilder.Entity<ProcessedWhatsAppMessage>()
+                .Property(m => m.MessageId)
+                .HasMaxLength(128)
+                .IsRequired();
+
+            modelBuilder.Entity<WhatsAppConversationSession>()
+                .HasIndex(s => new { s.BusinessPhoneNumberId, s.SenderWaId })
+                .IsUnique();
+
+            modelBuilder.Entity<WhatsAppConversationSession>()
+                .Property(s => s.BusinessPhoneNumberId)
+                .HasMaxLength(64)
+                .IsRequired();
+
+            modelBuilder.Entity<WhatsAppConversationSession>()
+                .Property(s => s.SenderWaId)
+                .HasMaxLength(32)
+                .IsRequired();
+
+            modelBuilder.Entity<WhatsAppConversationSession>()
+                .Property(s => s.SelectedProjectName)
+                .HasMaxLength(200)
+                .IsRequired();
         }
     }
 }

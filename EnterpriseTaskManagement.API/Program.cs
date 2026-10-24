@@ -11,8 +11,10 @@ using EnterpriseTaskManagement.Application.Services.Interfaces;
 using EnterpriseTaskManagement.Application.Services.RoleService;
 using EnterpriseTaskManagement.Application.Services.TaskAnalysisService;
 using EnterpriseTaskManagement.Application.Services.UserService;
+using EnterpriseTaskManagement.Application.Services.WhatsApp;
 using EnterpriseTaskManagement.Infrastructure.AI;
 using EnterpriseTaskManagement.Infrastructure.ImageStorage;
+using EnterpriseTaskManagement.Infrastructure.WhatsApp;
 using EnterpriseTaskManagement.Persistence;
 using EnterpriseTaskManagement.Persistence.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,10 +32,12 @@ if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
 var builder = WebApplication.CreateBuilder(args);
 
 var aiEnabled = IsFeatureFlagEnabled(builder.Configuration["AI_ENABLED"]);
+var whatsAppEnabled = IsFeatureFlagEnabled(builder.Configuration["WHATSAPP_ENABLED"]);
 
 if (builder.Environment.IsDevelopment())
 {
     Console.WriteLine($"AI features enabled: {aiEnabled}");
+    Console.WriteLine($"WhatsApp integration enabled: {whatsAppEnabled}");
 }
 
 // Add services to the container.
@@ -65,6 +69,12 @@ builder.Services.AddScoped<IProjectUserRepository, ProjectUserRepository>();
 builder.Services.AddScoped<IUserSkillRepository, UserSkillRepository>();
 builder.Services.AddScoped<ISkillRepository, SkillRepository>();
 builder.Services.AddScoped<ISkillService, SkillService>();
+builder.Services.AddScoped<IWhatsAppContactRepository, WhatsAppContactRepository>();
+builder.Services.AddScoped<IProcessedWhatsAppMessageRepository, ProcessedWhatsAppMessageRepository>();
+builder.Services.AddScoped<IWhatsAppConversationSessionRepository, WhatsAppConversationSessionRepository>();
+builder.Services.AddScoped<IWhatsAppContactService, WhatsAppContactService>();
+builder.Services.AddScoped<IWhatsAppInboundHandler, WhatsAppInboundHandler>();
+builder.Services.AddScoped<IWhatsAppBotUserSeeder, WhatsAppBotUserSeeder>();
 
 // Register Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -196,7 +206,64 @@ else
 builder.Services.AddScoped<ITaskAnalysisService, TaskAnalysisService>();
 builder.Services.AddScoped<IAiTaskWorkflowService, AiTaskWorkflowService>();
 
+var whatsAppSettings = new WhatsAppSettings
+{
+    Enabled = whatsAppEnabled,
+    VerifyToken = builder.Configuration["WHATSAPP_VERIFY_TOKEN"] ?? string.Empty,
+    AppSecret = builder.Configuration["WHATSAPP_APP_SECRET"] ?? string.Empty,
+    AccessToken = builder.Configuration["WHATSAPP_ACCESS_TOKEN"] ?? string.Empty,
+    GraphApiBaseUrl = builder.Configuration["WHATSAPP_GRAPH_API_BASE_URL"]
+        ?? "https://graph.facebook.com/v21.0",
+    SendReplies = IsFeatureFlagEnabled(
+        builder.Configuration["WHATSAPP_SEND_REPLIES"] ?? "true")
+};
+
+builder.Services.AddSingleton(whatsAppSettings);
+
+if (whatsAppSettings.Enabled)
+{
+    if (string.IsNullOrWhiteSpace(whatsAppSettings.VerifyToken))
+    {
+        throw new InvalidOperationException(
+            "WHATSAPP_VERIFY_TOKEN is required when WHATSAPP_ENABLED=true.");
+    }
+
+    if (string.IsNullOrWhiteSpace(whatsAppSettings.AppSecret))
+    {
+        throw new InvalidOperationException(
+            "WHATSAPP_APP_SECRET is required when WHATSAPP_ENABLED=true.");
+    }
+
+    if (string.IsNullOrWhiteSpace(whatsAppSettings.AccessToken))
+    {
+        throw new InvalidOperationException(
+            "WHATSAPP_ACCESS_TOKEN is required when WHATSAPP_ENABLED=true.");
+    }
+
+    if (!aiEnabled)
+    {
+        throw new InvalidOperationException(
+            "AI_ENABLED must be true when WHATSAPP_ENABLED=true (WhatsApp creates tasks via AI analysis).");
+    }
+
+    builder.Services.AddHttpClient<IWhatsAppCloudApiClient, WhatsAppCloudApiClient>(client =>
+    {
+        client.Timeout = TimeSpan.FromMinutes(2);
+    });
+}
+else
+{
+    builder.Services.AddScoped<IWhatsAppCloudApiClient, DisabledWhatsAppCloudApiClient>();
+}
+
 var app = builder.Build();
+
+if (whatsAppSettings.Enabled)
+{
+    using var scope = app.Services.CreateScope();
+    var botSeeder = scope.ServiceProvider.GetRequiredService<IWhatsAppBotUserSeeder>();
+    botSeeder.EnsureBotUserExistsAsync().GetAwaiter().GetResult();
+}
 
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
